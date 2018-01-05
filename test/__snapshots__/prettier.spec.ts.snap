@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prettier resolvePrettierConfigForFile() brand-new-jsx-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
+exports[`prettier resolvePrettierConfigForFile() empty-javascript-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
+exports[`prettier resolvePrettierConfigForFile() multiple-updated-lines-javascript-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "none",
+}
+`;
+
+exports[`prettier resolvePrettierConfigForFile() single-updated-line-typescript 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
