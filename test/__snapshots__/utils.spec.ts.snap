@@ -1,0 +1,137 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utils calculateCharacterRangesFromLineChanges() brand-new-jsx-file 1`] = `
+Array [
+  Object {
+    "rangeEnd": 661,
+    "rangeStart": 0,
+  },
+]
+`;
+
+exports[`utils calculateCharacterRangesFromLineChanges() empty-javascript-file 1`] = `
+Array [
+  Object {
+    "rangeEnd": 53,
+    "rangeStart": 0,
+  },
+]
+`;
+
+exports[`utils calculateCharacterRangesFromLineChanges() formatting-would-affect-total-line-count 1`] = `
+Array [
+  Object {
+    "rangeEnd": 75,
+    "rangeStart": 62,
+  },
+  Object {
+    "rangeEnd": 130,
+    "rangeStart": 105,
+  },
+]
+`;
+
+exports[`utils calculateCharacterRangesFromLineChanges() multiple-updated-lines-javascript-file 1`] = `
+Array [
+  Object {
+    "rangeEnd": 127,
+    "rangeStart": 32,
+  },
+  Object {
+    "rangeEnd": 171,
+    "rangeStart": 133,
+  },
+]
+`;
+
+exports[`utils calculateCharacterRangesFromLineChanges() single-updated-line-typescript 1`] = `
+Array [
+  Object {
+    "rangeEnd": 29,
+    "rangeStart": 14,
+  },
+]
+`;
+
+exports[`utils extractLineChangeData() brand-new-jsx-file 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 21,
+      "start": 1,
+    },
+  ],
+  "removals": Array [],
+}
+`;
+
+exports[`utils extractLineChangeData() empty-javascript-file 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 2,
+      "start": 1,
+    },
+  ],
+  "removals": Array [],
+}
+`;
+
+exports[`utils extractLineChangeData() formatting-would-affect-total-line-count 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 2,
+      "start": 5,
+    },
+    Object {
+      "noOfLines": 2,
+      "start": 10,
+    },
+  ],
+  "removals": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 5,
+    },
+  ],
+}
+`;
+
+exports[`utils extractLineChangeData() multiple-updated-lines-javascript-file 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 2,
+    },
+    Object {
+      "noOfLines": 1,
+      "start": 6,
+    },
+  ],
+  "removals": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 2,
+    },
+  ],
+}
+`;
+
+exports[`utils extractLineChangeData() single-updated-line-typescript 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 2,
+    },
+  ],
+  "removals": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 2,
+    },
+  ],
+}
+`;

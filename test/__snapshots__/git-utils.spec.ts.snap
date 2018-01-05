@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`git-utils getDiffForFile() brand-new-jsx-file 1`] = `
+"diff --git a/brand-new-jsx-file.jsx b/brand-new-jsx-file.jsx
+new file mode 100644
+index 0000000..ae72777
+--- /dev/null
++++ b/brand-new-jsx-file.jsx
+@@ -0,0 +1,21 @@
++function HelloWorld({greeting = \\"hello\\", greeted = '\\"World\\"', silent = false, onMouseOver,}) {
++
++    if(!greeting){return null};
++  
++       // TODO: Don't use random in render
++    let num = Math.floor (Math.random() * 1E+7).toString().replace(/\\\\.\\\\d+/ig, \\"\\")
++  
++    return <div className='HelloWorld' title={\`You are visitor number \${ num }\`} onMouseOver={onMouseOver}>
++  
++      <strong>{ greeting.slice( 0, 1 ).toUpperCase() + greeting.slice(1).toLowerCase() }</strong>
++      {greeting.endsWith(\\",\\") ? \\" \\" : <span style={{color: '\\\\grey'}}>\\", \\"</span> }
++      <em>
++      { greeted }
++      </em>
++      { (silent)
++        ? \\".\\"
++        : \\"!\\"}
++  
++      </div>;
++  
++  }
+\\\\ No newline at end of file"
+`;
+
+exports[`git-utils getDiffForFile() empty-javascript-file 1`] = `
+"diff --git a/empty-javascript-file.js b/empty-javascript-file.js
+new file mode 100644
+index 0000000..3772dd0
+--- /dev/null
++++ b/empty-javascript-file.js
+@@ -0,0 +1,2 @@
++var greeting = 'hello'
++        var audience = 'world'
+\\\\ No newline at end of file"
+`;
+
+exports[`git-utils getDiffForFile() formatting-would-affect-total-line-count 1`] = `
+"diff --git a/formatting-would-affect-total-line-count.js b/formatting-would-affect-total-line-count.js
+index 4e74cec..5eda403 100644
+--- a/formatting-would-affect-total-line-count.js
++++ b/formatting-would-affect-total-line-count.js
+@@ -5 +5,2 @@ function myfunc(
+-    b
++    b,
++    c
+@@ -8,0 +10,2 @@ function myfunc(
++
++var newStatement = true"
+`;
+
+exports[`git-utils getDiffForFile() multiple-updated-lines-javascript-file 1`] = `
+"diff --git a/multiple-updated-lines-javascript-file.js b/multiple-updated-lines-javascript-file.js
+index 50d7ab7..2b98ecd 100644
+--- a/multiple-updated-lines-javascript-file.js
++++ b/multiple-updated-lines-javascript-file.js
+@@ -2 +2 @@ var     untouchedUglyLines1 = ''
+-function TouchedFunctionSignature({greeting = \\"Hello\\", greeted = '\\"World\\"', silent = false,}) {
++function TouchedFunctionSignature({greeting = \\"Hello\\", greeted = '\\"Mars\\"', silent = false,}) {
+@@ -5,0 +6 @@ function TouchedFunctionSignature({greeting = \\"Hello\\", greeted = '\\"World\\"', sile
++      const newlyAddedUglyLine = true
+\\\\ No newline at end of file"
+`;
+
+exports[`git-utils getDiffForFile() single-updated-line-typescript 1`] = `
+"diff --git a/single-updated-line-typescript.ts b/single-updated-line-typescript.ts
+index 30011dc..1f5fc71 100644
+--- a/single-updated-line-typescript.ts
++++ b/single-updated-line-typescript.ts
+@@ -2 +2 @@ const a = true
+-const b = false
+\\\\ No newline at end of file
++const b = true
+\\\\ No newline at end of file"
+`;

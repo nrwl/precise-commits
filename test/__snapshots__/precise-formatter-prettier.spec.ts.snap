@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`preciseFormatterPrettier resolveConfig() brand-new-jsx-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
+exports[`preciseFormatterPrettier resolveConfig() empty-javascript-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
+exports[`preciseFormatterPrettier resolveConfig() formatting-would-affect-total-line-count 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
+exports[`preciseFormatterPrettier resolveConfig() multiple-updated-lines-javascript-file 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "none",
+}
+`;
+
+exports[`preciseFormatterPrettier resolveConfig() single-updated-line-typescript 1`] = `
+Object {
+  "parser": "typescript",
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;

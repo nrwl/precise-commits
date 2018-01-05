@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`precise-commits main() brand-new-jsx-file 1`] = `
+"function HelloWorld({
+  greeting = 'hello',
+  greeted = '\\"World\\"',
+  silent = false,
+  onMouseOver,
+}) {
+  if (!greeting) {
+    return null;
+  }
+
+  // TODO: Don't use random in render
+  let num = Math.floor(Math.random() * 1e7)
+    .toString()
+    .replace(/\\\\.\\\\d+/gi, '');
+
+  return (
+    <div
+      className=\\"HelloWorld\\"
+      title={\`You are visitor number \${num}\`}
+      onMouseOver={onMouseOver}
+    >
+      <strong>
+        {greeting.slice(0, 1).toUpperCase() + greeting.slice(1).toLowerCase()}
+      </strong>
+      {greeting.endsWith(',') ? (
+        ' '
+      ) : (
+        <span style={{ color: 'grey' }}>\\", \\"</span>
+      )}
+      <em>{greeted}</em>
+      {silent ? '.' : '!'}
+    </div>
+  );
+}
+"
+`;
+
+exports[`precise-commits main() empty-javascript-file 1`] = `
+"var greeting = 'hello';
+var audience = 'world';
+"
+`;
+
+exports[`precise-commits main() formatting-would-affect-total-line-count 1`] = `
+"  var untouchedUglyLine     =      10
+
+function myfunc(a, b, c) {
+  console.log('blah');
+}
+
+var newStatement = true;
+"
+`;
+
+exports[`precise-commits main() multiple-updated-lines-javascript-file 1`] = `
+"var     untouchedUglyLines1 = ''
+function TouchedFunctionSignature({
+  greeting = \\"Hello\\",
+  greeted = '\\"Mars\\"',
+  silent = false
+}) {}
+      const newlyAddedUglyLine = true;"
+`;
+
+exports[`precise-commits main() single-updated-line-typescript 1`] = `
+"const a = true
+const b = true;"
+`;
