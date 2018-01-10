@@ -30,16 +30,18 @@ prettierLines(process.cwd(), {
   onBegunProcessingFile(filename, index, totalFiles) {
     spinnersByFilename[filename] = ora()
       .start()
-      .info(` [${index + 1}/${totalFiles}] Processing file: ${filename}`);
+      .succeed(` [${index + 1}/${totalFiles}] Processing file: ${filename}`);
   },
   onFinishedProcessingFile(filename, index, status) {
     const spinner = spinnersByFilename[filename];
     switch (status) {
       case 'UPDATED':
-        spinner.succeed('Updated: ${filename}');
+        spinner.succeed(`       --> Updated formatting in: ${filename}`);
         break;
       case 'NOT_UPDATED':
-        spinner.info('No updates made to: ${filename}');
+        spinner.info(
+          `       --> No formatting changes required in: ${filename}`,
+        );
         break;
     }
   },
