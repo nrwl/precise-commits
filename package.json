@@ -5,6 +5,7 @@
   "author": "James Henry <james@henry.sc>",
   "description": "prettier-lines",
   "files": [
+    "bin",
     "lib"
   ],
   "repository": "JamesHenry/prettier-lines",
@@ -15,7 +16,7 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "precommit": "npm test && npm run prettier-lines",
     "cz": "git-cz",
-    "prettier-lines": "node ./bin/prettier-lines.js"
+    "prettier-lines": "./bin/prettier-lines.js"
   },
   "devDependencies": {
     "@types/execa": "^0.8.1",

@@ -12,6 +12,8 @@ const prettierLines = require('../lib').main;
 const primarySpinner = ora(' Running prettier-lines...');
 const stagedFileSpinner = ora(' Detecting staged files...');
 
+const spinnersByFilename = {};
+
 prettierLines(process.cwd(), {
   onInit(workingDirectory) {
     primarySpinner.start();
@@ -26,10 +28,20 @@ prettierLines(process.cwd(), {
     );
   },
   onBegunProcessingFile(filename, index, totalFiles) {
-    const individualFileSpinner = ora().start(
-      ` [${index + 1}/${totalFiles}] Processing file: ${filename}`,
-    );
-    individualFileSpinner.succeed();
+    spinnersByFilename[filename] = ora()
+      .start()
+      .info(` [${index + 1}/${totalFiles}] Processing file: ${filename}`);
+  },
+  onFinishedProcessingFile(filename, index, status) {
+    const spinner = spinnersByFilename[filename];
+    switch (status) {
+      case 'UPDATED':
+        spinner.succeed('Updated: ${filename}');
+        break;
+      case 'NOT_UPDATED':
+        spinner.info('No updates made to: ${filename}');
+        break;
+    }
   },
   onError(err) {
     stagedFileSpinner.fail(' prettier-lines: An Error occurred\n');

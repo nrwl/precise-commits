@@ -15,6 +15,9 @@ export interface CharacterRange {
   rangeEnd: number;
 }
 
+export const NO_LINE_CHANGE_DATA_ERROR =
+  'No line change data could be detected';
+
 /**
  * Addition `start` number included in the range,
  * removal `start` is the line before
@@ -22,7 +25,7 @@ export interface CharacterRange {
 export function extractLineChangeData(diffData: string) {
   const lineChanges = diffData.match(/@@.*@@/g);
   if (!lineChanges) {
-    throw new Error('No line change data could be detected');
+    throw new Error(NO_LINE_CHANGE_DATA_ERROR);
   }
   const lineChangeData: {
     removals: LineChanges[];

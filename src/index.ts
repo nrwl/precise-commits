@@ -5,11 +5,15 @@ import { getDiffForFile, getStagedModifiedFiles } from './git-utils';
 import {
   extractLineChangeData,
   calculateCharacterRangesFromLineChanges,
+  NO_LINE_CHANGE_DATA_ERROR,
+  LineChangeData,
 } from './utils';
 import {
   formatRangesWithinContents,
   resolvePrettierConfigForFile,
 } from './prettier';
+
+export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED';
 
 export interface Callbacks {
   onInit(workingDirectory: string): void;
@@ -18,6 +22,11 @@ export interface Callbacks {
     filename: string,
     index: number,
     totalFiles: number,
+  ): void;
+  onFinishedProcessingFile(
+    filename: string,
+    index: number,
+    status: ProcessingStatus,
   ): void;
   onError(err: Error): void;
   onComplete(totalFiles: number): void;
@@ -32,6 +41,7 @@ export function main(
     onInit() {},
     onModifiedFilesDetected() {},
     onBegunProcessingFile() {},
+    onFinishedProcessingFile() {},
     onError() {},
     onComplete() {},
   },
@@ -55,7 +65,19 @@ export function main(
       /**
        * Extract line change data from the git diff results
        */
-      const lineChangeData = extractLineChangeData(diff);
+      let lineChangeData: LineChangeData = { additions: [], removals: [] };
+      try {
+        lineChangeData = extractLineChangeData(diff);
+      } catch (err) {
+        if (err.message === NO_LINE_CHANGE_DATA_ERROR) {
+          return callbacks.onFinishedProcessingFile(
+            filename,
+            index,
+            'NOT_UPDATED',
+          );
+        }
+        throw err;
+      }
       /**
        * Convert the line change data into character data
        */
@@ -74,12 +96,17 @@ export function main(
         prettierConfig,
       );
       if (formattedFileContents === fileContents) {
-        return;
+        return callbacks.onFinishedProcessingFile(
+          filename,
+          index,
+          'NOT_UPDATED',
+        );
       }
       /**
        * Write the file back to disk
        */
       writeFileSync(fullPath, formattedFileContents);
+      return callbacks.onFinishedProcessingFile(filename, index, 'UPDATED');
     });
 
     callbacks.onComplete(totalFiles);
