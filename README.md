@@ -11,7 +11,3 @@
 </p>
 
 <br>
-<p align="center" style="border: 1px solid blue;">
-<a href="http://typescriptcourses.com" target="_blank"><img src="https://user-images.githubusercontent.com/900523/33187671-54d039fc-d08b-11e7-809b-b5b99b5a8a8f.png" alt="typescriptcourses.com"/></a>
-</p>
-<br>
