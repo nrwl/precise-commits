@@ -14,7 +14,7 @@
 
 # The elevator pitch: Why use `prettier-lines`?
 
-It is **unequivocally the least disruptive way** to add code formatting by [Prettier](https://prettier.io) to an existing codebase.
+It is simply **the least disruptive way** to add code formatting by [Prettier](https://prettier.io) to an existing codebase.
 
 # Background
 
@@ -60,13 +60,13 @@ npm install --save-dev prettier prettier-lines
 
 1. Add an npm script to your package.json, such as:
 
-```json
+```js
 {
-    //...
-    "scripts": {
-        "prettier-lines": "prettier-lines"`
-    }
-    //...
+  //...
+  "scripts": {
+    "prettier-lines": "prettier-lines"
+  }
+  //...
 }
 ```
 
@@ -88,13 +88,13 @@ npm install --save-dev husky
 
 Update the `"scripts"` section of your `package.json`:
 
-```json
+```js
 {
-    //...
-    "scripts": {
-        "prettier-lines": "prettier-lines",
-        "precommit": "npm run prettier-lines"`
-    }
-    //...
+  //...
+  "scripts": {
+    "prettier-lines": "prettier-lines",
+    "precommit": "npm run prettier-lines"
+  }
+  //...
 }
 ```

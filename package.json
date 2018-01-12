@@ -29,8 +29,7 @@
     "prettier": "^1.9.2",
     "semantic-release": "^11.0.2",
     "ts-jest": "^22.0.0",
-    "typescript": "^2.6.2",
-    "typescript-eslint-parser": "^11.0.0"
+    "typescript": "^2.6.2"
   },
   "dependencies": {
     "execa": "^0.8.0",
