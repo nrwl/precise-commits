@@ -58,6 +58,8 @@ npm install --save-dev prettier prettier-lines
 
 `prettier-lines` will automatically pick up on any of the standard [Prettier configuration files](https://prettier.io/docs/en/configuration) you may have in your project, including [`.prettierignore`](https://prettier.io/docs/en/ignore#ignoring-files) files.
 
+## 1. Running it manually
+
 1. Add an npm script to your package.json, such as:
 
 ```js
@@ -76,7 +78,7 @@ npm install --save-dev prettier prettier-lines
 npm run prettier-lines
 ```
 
-## "Precommit" Hook
+## 2. "Precommit" Hook
 
 The recommended way to run `prettier-lines` is as a "precommit" hook.
 
