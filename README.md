@@ -44,9 +44,9 @@ This is where `prettier-lines` comes in!
 
 Through analyzing your staged files `prettier-lines` will work out exactly what lines and characters within those files have actually been changed or added.
 
-It then uses this information to run [Prettier](https://prettier.io) in a very focused way, allowing it to only reformat what is relevant for your current work, and allowing you to keep your PRs small and focused!
+It then uses this information to run [Prettier](https://prettier.io) in a very focused way, allowing it to only reformat what is relevant for your current work, and allowing you to keep your PRs small and explicit!
 
-## Installation
+# Installation
 
 `prettier-lines` expects `prettier` to be available as a `peerDependency`, so you will need to install this yourself as a `devDependency` of your project.
 
@@ -54,7 +54,7 @@ It then uses this information to run [Prettier](https://prettier.io) in a very f
 npm install --save-dev prettier prettier-lines
 ```
 
-## Usage
+# Usage
 
 `prettier-lines` will automatically pick up on any of the standard [Prettier configuration files](https://prettier.io/docs/en/configuration) you may have in your project, including [`.prettierignore`](https://prettier.io/docs/en/ignore#ignoring-files) files.
 
