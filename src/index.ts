@@ -11,9 +11,14 @@ import {
 import {
   formatRangesWithinContents,
   resolvePrettierConfigForFile,
+  checkRangesWithinContents,
 } from './prettier';
 
-export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED';
+export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
+
+export interface AdditionalOptions {
+  checkOnly: boolean;
+}
 
 export interface Callbacks {
   onInit(workingDirectory: string): void;
@@ -32,11 +37,18 @@ export interface Callbacks {
   onComplete(totalFiles: number): void;
 }
 
+function applyDefaults(options: AdditionalOptions): AdditionalOptions {
+  options = options || {};
+  options.checkOnly = !!options.checkOnly;
+  return options;
+}
+
 /**
  * prettier-lines library
  */
 export function main(
   workingDirectory: string,
+  options: AdditionalOptions,
   callbacks: Callbacks = {
     onInit() {},
     onModifiedFilesDetected() {},
@@ -46,6 +58,10 @@ export function main(
     onComplete() {},
   },
 ) {
+  /**
+   * Apply default options
+   */
+  const { checkOnly } = applyDefaults(options);
   try {
     callbacks.onInit(workingDirectory);
 
@@ -87,9 +103,32 @@ export function main(
       );
       /**
        * Run prettier on the file, multiple times if required, instructing it
-       * to only focus on the calculated range(s)
+       * to only focus on the calculated range(s).
+       *
+       * If `checkOnly` is set, only check to see if the formatting is valid,
+       * otherwise automatically update the formatting.
        */
       const prettierConfig = resolvePrettierConfigForFile(fullPath);
+      /**
+       * CHECK
+       */
+      if (checkOnly) {
+        const isValid = checkRangesWithinContents(
+          characterRanges,
+          fileContents,
+          prettierConfig,
+        );
+        if (!isValid) {
+          return callbacks.onFinishedProcessingFile(
+            filename,
+            index,
+            'INVALID_FORMATTING',
+          );
+        }
+      }
+      /**
+       * FORMAT
+       */
       const formattedFileContents = formatRangesWithinContents(
         characterRanges,
         fileContents,

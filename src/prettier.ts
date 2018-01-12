@@ -1,6 +1,12 @@
 import * as fs from 'fs';
 import { extname, join } from 'path';
-import { resolveConfig, format, getSupportInfo, Options } from 'prettier';
+import {
+  resolveConfig,
+  format,
+  check,
+  getSupportInfo,
+  Options,
+} from 'prettier';
 
 const ignore = require('ignore');
 
@@ -21,7 +27,7 @@ export function formatRangesWithinContents(
   prettierConfig: Options | null,
 ): string {
   let formattedContents = fileContents;
-  characterRanges.forEach((characterRange) => {
+  characterRanges.forEach(characterRange => {
     formattedContents = format(formattedContents, {
       ...prettierConfig,
       ...{
@@ -29,8 +35,29 @@ export function formatRangesWithinContents(
         rangeEnd: characterRange.rangeEnd,
       },
     });
-  })
+  });
   return formattedContents;
+}
+
+/**
+ * Ensure the given content has been run through prettier for the specific range data given.
+ * This may require running prettier on the file multiple times for multiple ranges.
+ */
+export function checkRangesWithinContents(
+  characterRanges: any[],
+  fileContents: string,
+  prettierConfig: Options | null,
+): boolean {
+  let formattedContents = fileContents;
+  return characterRanges.every(characterRange => {
+    return check(formattedContents, {
+      ...prettierConfig,
+      ...{
+        rangeStart: characterRange.rangeStart,
+        rangeEnd: characterRange.rangeEnd,
+      },
+    });
+  });
 }
 
 let PRETTIER_SUPPORTED_FILE_EXTENSIONS: string[] = [];

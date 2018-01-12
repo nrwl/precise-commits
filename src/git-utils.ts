@@ -25,6 +25,9 @@ export function getDiffForFile(filename: string): string {
 }
 
 /**
+ * NOTE: We are only explicitly testing "Modified" and "Added" files for now...
+ * ----------------------------------------------------------------------
+ *
  * Output of `git diff-index --help`:
  *
  * --diff-filter=[(A|C|D|M|R|T|U|X|B)...[*]]
@@ -38,9 +41,6 @@ export function getDiffForFile(filename: string): string {
       Also, these upper-case letters can be downcased to exclude. E.g.  --diff-filter=ad excludes
       added and deleted paths.
  *
- */
-/**
- * Note: We are only explicitly testing "Modified" and "Added" files for now...
  */
 const DIFF_INDEX_FILTER = 'ACDMRTUXB';
 const SPECIAL_EMPTY_TREE_COMMIT_HASH =
