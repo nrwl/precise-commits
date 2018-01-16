@@ -27,6 +27,106 @@ interface CustomPrettierConfig {
   contents: string;
 }
 
+class TmpFile {
+  name: string;
+  filename: string;
+  directoryPath: string;
+  initialContents?: string;
+  stagedContents: string;
+  path: string;
+}
+
+export class TestBed {
+  private static readonly TMP_DIRECTORY_PATH = `${process.cwd()}/tmp`;
+  private TEST_BED_DIRECTORY_PATH: string;
+  private fixtureToTmpFile = new Map<Fixture, TmpFile>();
+
+  constructor(private testBedName: string) {
+    this.TEST_BED_DIRECTORY_PATH = `${
+      TestBed.TMP_DIRECTORY_PATH
+    }/${testBedName}`;
+    runCommandSync('mkdir', [`./${testBedName}`], TestBed.TMP_DIRECTORY_PATH);
+  }
+
+  getTmpFileForFixture(fixture: Fixture): TmpFile {
+    return this.fixtureToTmpFile.get(fixture);
+  }
+
+  prepareFixtureInTmpDirectory(fixture: Fixture): void {
+    /**
+     * Create and cache a TmpFile for the given Fixture
+     */
+    const tmpFile = this.createTmpFileForFixture(fixture);
+    this.fixtureToTmpFile.set(fixture, tmpFile);
+    /**
+     * Initialise a .git directory for the fixture
+     */
+    runCommandSync('mkdir', ['-p', tmpFile.name], this.TEST_BED_DIRECTORY_PATH);
+    runCommandSync('git', ['init'], tmpFile.directoryPath);
+    /**
+     * Apply the two different file contents to the TmpFile
+     */
+    this.applyInitialAndStagedContentsOnDisk(tmpFile);
+    /**
+     * Apply any custom prettier config if present
+     */
+    this.applyCustomPrettierConfig(tmpFile, fixture.customPrettierConfig);
+  }
+
+  private applyInitialAndStagedContentsOnDisk(tmpFile: TmpFile): void {
+    /**
+     * If we editing an existing `initial` file, we need to first create
+     * it and commit it
+     */
+    if (tmpFile.initialContents) {
+      this.createAndCommitTmpFileOnDisk(tmpFile);
+    }
+    this.stageGivenChangesToTmpFileOnDisk(tmpFile);
+  }
+
+  private createTmpFileForFixture(fixture: Fixture): TmpFile {
+    const name = fixture.fixtureName;
+    const filename = `${name}${fixture.fileExtension}`;
+    const directoryPath = `${this.TEST_BED_DIRECTORY_PATH}/${name}`;
+    return {
+      name,
+      filename,
+      directoryPath,
+      path: `${directoryPath}/${filename}`,
+      initialContents: fixture.initialContents,
+      stagedContents: fixture.stagedContents,
+    };
+  }
+
+  private applyCustomPrettierConfig(
+    tmpFile: TmpFile,
+    customPrettierConfig: CustomPrettierConfig | null,
+  ): void {
+    if (!customPrettierConfig) {
+      return;
+    }
+    writeFileSync(
+      `${tmpFile.directoryPath}/${customPrettierConfig.filename}`,
+      customPrettierConfig.contents,
+    );
+  }
+
+  private createAndCommitTmpFileOnDisk(tmpFile: TmpFile): void {
+    writeFileSync(tmpFile.path, tmpFile.initialContents);
+    runCommandSync('git', ['add', tmpFile.path], tmpFile.directoryPath);
+    runCommandSync(
+      'git',
+      ['commit', '-m', `adding initial contents for ${tmpFile.path}`],
+      tmpFile.directoryPath,
+    );
+  }
+
+  private stageGivenChangesToTmpFileOnDisk(tmpFile: TmpFile): void {
+    writeFileSync(tmpFile.path, tmpFile.stagedContents);
+    runCommandSync('git', ['add', tmpFile.path], tmpFile.directoryPath);
+  }
+}
+
 export function readFixtures(): Fixture[] {
   const fixtures = readdirSync('./test/fixtures');
   return fixtures.map(name => {
@@ -68,111 +168,4 @@ export function readFixtures(): Fixture[] {
           },
     };
   });
-}
-
-export const TMP_DIRECTORY_PATH = process.cwd() + '/tmp';
-
-let tmpFileExtension = '.js';
-function setTmpFileExtension(extension: string) {
-  tmpFileExtension = extension;
-}
-
-function getTmpFileName() {
-  return `tmp${tmpFileExtension}`;
-}
-
-export function getTmpFilePath() {
-  return `${TMP_DIRECTORY_PATH}/${getTmpFileName()}`;
-}
-
-export function destroyTmpDirectory() {
-  runCommandSync('rm', ['-rf', TMP_DIRECTORY_PATH]);
-}
-
-export function createTmpDirectoryAndInitialiseGit() {
-  createTmpDirectory();
-  initialiseGit();
-}
-
-export function getTmpFileContents() {
-  return readFileSync(getTmpFilePath(), 'utf8');
-}
-
-export function prepareFixtureInTmpDirectory({
-  fixtureName,
-  fileExtension,
-  initialContents,
-  stagedContents,
-  customPrettierConfig,
-}: Fixture): void {
-  applyInitialAndStagedToTmpFile(
-    initialContents,
-    stagedContents,
-    fileExtension,
-  );
-  applyCustomPrettierConfig(customPrettierConfig);
-}
-
-function applyInitialAndStagedToTmpFile(
-  initialContents: string,
-  stagedContents: string,
-  fileExtension: string,
-) {
-  setTmpFileExtension(fileExtension);
-  /**
-   * If we editing an existing `initial` file, we need to first create
-   * it and commit it
-   */
-  if (initialContents) {
-    createAndCommitTmpFileForContents(initialContents);
-  }
-  stageGivenChangesToTmpFile(stagedContents);
-}
-
-function applyCustomPrettierConfig(
-  customPrettierConfig: CustomPrettierConfig | null,
-) {
-  if (!customPrettierConfig) {
-    return;
-  }
-  writeFileSync(
-    TMP_DIRECTORY_PATH + '/' + customPrettierConfig.filename,
-    customPrettierConfig.contents,
-  );
-}
-
-function createTmpDirectory() {
-  destroyTmpDirectory();
-  runCommandSync('mkdir', [TMP_DIRECTORY_PATH]);
-}
-
-function initialiseGit() {
-  runCommandSync('rm', ['-rf', '.git'], TMP_DIRECTORY_PATH);
-  runCommandSync('git', ['init'], TMP_DIRECTORY_PATH);
-}
-
-function createAndGitAddFile({ filename, content }) {
-  writeFileSync(TMP_DIRECTORY_PATH + '/' + filename, content);
-  runCommandSync('git', ['add', filename], TMP_DIRECTORY_PATH);
-}
-
-function createAndCommitTmpFileForContents(contents: string) {
-  const opts = {
-    filename: getTmpFileName(),
-    content: contents,
-  };
-  createAndGitAddFile(opts);
-  runCommandSync(
-    'git',
-    ['commit', '-m', `adding ${opts.filename}`],
-    TMP_DIRECTORY_PATH,
-  );
-}
-
-function stageGivenChangesToTmpFile(changedContent: string) {
-  const opts = {
-    filename: getTmpFileName(),
-    content: changedContent,
-  };
-  createAndGitAddFile(opts);
 }

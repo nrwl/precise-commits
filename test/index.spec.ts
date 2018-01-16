@@ -1,29 +1,27 @@
-import {
-  TMP_DIRECTORY_PATH,
-  destroyTmpDirectory,
-  readFixtures,
-  getTmpFileContents,
-  createTmpDirectoryAndInitialiseGit,
-  prepareFixtureInTmpDirectory,
-} from './test-utils';
+import { readFileSync } from 'fs';
+
+import { TestBed, readFixtures } from './test-utils';
 
 import { main } from '../src/index';
 
 const fixtures = readFixtures();
 
 describe('prettier-lines', () => {
+  let testBed: TestBed;
+
   describe('main()', function() {
-    beforeEach(createTmpDirectoryAndInitialiseGit);
+    beforeAll(() => {
+      testBed = new TestBed('main');
+    });
 
     fixtures.forEach(fixture => {
       it(fixture.fixtureName, () => {
-        prepareFixtureInTmpDirectory(fixture);
-        main(TMP_DIRECTORY_PATH);
-        const formatted = getTmpFileContents();
+        testBed.prepareFixtureInTmpDirectory(fixture);
+        const tmpFile = testBed.getTmpFileForFixture(fixture);
+        main(tmpFile.directoryPath, { checkOnly: false });
+        const formatted = readFileSync(tmpFile.path, 'utf8');
         expect(formatted).toMatchSnapshot();
       });
     });
-
-    afterEach(destroyTmpDirectory);
   });
 });

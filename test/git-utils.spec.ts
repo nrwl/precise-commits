@@ -1,13 +1,6 @@
 import { join } from 'path';
 
-import {
-  TMP_DIRECTORY_PATH,
-  destroyTmpDirectory,
-  readFixtures,
-  getTmpFilePath,
-  createTmpDirectoryAndInitialiseGit,
-  prepareFixtureInTmpDirectory,
-} from './test-utils';
+import { TestBed, readFixtures } from './test-utils';
 import {
   getDiffForFile,
   resolveNearestGitDirectory,
@@ -17,52 +10,60 @@ import {
 const fixtures = readFixtures();
 
 describe('git-utils', () => {
-  describe('resolveNearestGitDirectory()', () => {
-    beforeEach(createTmpDirectoryAndInitialiseGit);
+  let testBed: TestBed;
 
-    it('should find the nearest .git directory to the given file by traversing up the parent hierarchy', () => {
-      /**
-       * This current spec file should use the repo's root .git
-       */
+  describe('resolveNearestGitDirectory()', () => {
+    beforeAll(() => {
+      testBed = new TestBed('resolveNearestGitDirectory');
+    });
+
+    fixtures.forEach(fixture => {
+      it(fixture.fixtureName, () => {
+        testBed.prepareFixtureInTmpDirectory(fixture);
+        const tmpFile = testBed.getTmpFileForFixture(fixture);
+        /**
+         * The tmpFile should resolve to its own .git directory
+         */
+        expect(resolveNearestGitDirectory(tmpFile.directoryPath)).toEqual(
+          join(tmpFile.directoryPath, '.git'),
+        );
+      });
+    });
+
+    it(`should resolve the overall project's .git directory for this spec file`, () => {
       expect(resolveNearestGitDirectory(__dirname)).toEqual(
         join(__dirname, '../.git'),
       );
-      /**
-       * The tmp file should resolve to its own .git directory within the tmp directory
-       */
-      expect(resolveNearestGitDirectory(TMP_DIRECTORY_PATH)).toEqual(
-        join(TMP_DIRECTORY_PATH, '.git'),
-      );
     });
-
-    afterEach(destroyTmpDirectory);
   });
 
   describe('getDiffForFile()', () => {
-    beforeEach(createTmpDirectoryAndInitialiseGit);
+    beforeAll(() => {
+      testBed = new TestBed('getDiffForFile');
+    });
 
     fixtures.forEach(fixture => {
       it(fixture.fixtureName, () => {
-        prepareFixtureInTmpDirectory(fixture);
-        const diff = getDiffForFile(getTmpFilePath());
+        testBed.prepareFixtureInTmpDirectory(fixture);
+        const tmpFile = testBed.getTmpFileForFixture(fixture);
+        const diff = getDiffForFile(tmpFile.path);
         expect(diff).toMatchSnapshot();
       });
     });
-
-    afterEach(destroyTmpDirectory);
   });
 
   describe('getStagedModifiedFiles()', () => {
-    beforeEach(createTmpDirectoryAndInitialiseGit);
+    beforeAll(() => {
+      testBed = new TestBed('getStagedModifiedFiles');
+    });
 
     fixtures.forEach(fixture => {
       it(fixture.fixtureName, () => {
-        prepareFixtureInTmpDirectory(fixture);
-        const fileNames = getStagedModifiedFiles(TMP_DIRECTORY_PATH);
-        expect(fileNames).toEqual([`tmp${fixture.fileExtension}`]);
+        testBed.prepareFixtureInTmpDirectory(fixture);
+        const tmpFile = testBed.getTmpFileForFixture(fixture);
+        const fileNames = getStagedModifiedFiles(tmpFile.directoryPath);
+        expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });
     });
-
-    afterEach(destroyTmpDirectory);
   });
 });
