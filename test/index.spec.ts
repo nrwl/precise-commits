@@ -5,13 +5,12 @@ import { TestBed, readFixtures } from './test-utils';
 import { main } from '../src/index';
 
 const fixtures = readFixtures();
+let testBed: TestBed;
 
 describe('prettier-lines', () => {
-  let testBed: TestBed;
-
   describe('main()', function() {
     beforeAll(() => {
-      testBed = new TestBed('main');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {

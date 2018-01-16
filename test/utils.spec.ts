@@ -6,13 +6,12 @@ import {
 } from '../src/utils';
 
 const fixtures = readFixtures();
+let testBed: TestBed;
 
 describe('utils', () => {
-  let testBed: TestBed;
-
   describe('extractLineChangeData()', () => {
     beforeAll(() => {
-      testBed = new TestBed('extractLineChangeData');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {
@@ -28,7 +27,7 @@ describe('utils', () => {
 
   describe('calculateCharacterRangesFromLineChanges()', () => {
     beforeAll(() => {
-      testBed = new TestBed('calculateCharacterRangesFromLineChanges');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {

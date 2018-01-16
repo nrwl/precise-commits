@@ -41,7 +41,7 @@ export class TestBed {
   private TEST_BED_DIRECTORY_PATH: string;
   private fixtureToTmpFile = new Map<Fixture, TmpFile>();
 
-  constructor(private testBedName: string) {
+  constructor(private testBedName: string = `${Date.now()}`) {
     this.TEST_BED_DIRECTORY_PATH = `${
       TestBed.TMP_DIRECTORY_PATH
     }/${testBedName}`;

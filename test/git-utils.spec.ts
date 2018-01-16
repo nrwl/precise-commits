@@ -8,13 +8,12 @@ import {
 } from '../src/git-utils';
 
 const fixtures = readFixtures();
+let testBed: TestBed;
 
 describe('git-utils', () => {
-  let testBed: TestBed;
-
   describe('resolveNearestGitDirectory()', () => {
     beforeAll(() => {
-      testBed = new TestBed('resolveNearestGitDirectory');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {
@@ -39,7 +38,7 @@ describe('git-utils', () => {
 
   describe('getDiffForFile()', () => {
     beforeAll(() => {
-      testBed = new TestBed('getDiffForFile');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {
@@ -54,7 +53,7 @@ describe('git-utils', () => {
 
   describe('getStagedModifiedFiles()', () => {
     beforeAll(() => {
-      testBed = new TestBed('getStagedModifiedFiles');
+      testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {
