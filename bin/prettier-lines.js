@@ -13,15 +13,22 @@ const prettierLines = require('../lib').main;
 const config = mri(process.argv.slice(2));
 
 /**
- * If the user provided a glob pattern to match against, ensure that there are
+ * If the user provided one or more glob patterns to match against, ensure that there are
  * applicable files available
  */
 let filesWhitelist = null;
 if (config.whitelist) {
-  filesWhitelist = glob.sync(config.whitelist);
+  filesWhitelist = [];
+  if (Array.isArray(config.whitelist)) {
+    config.whitelist.forEach(pattern => {
+      filesWhitelist = [...filesWhitelist, ...glob.sync(config.whitelist)];
+    });
+  } else {
+    filesWhitelist = glob.sync(config.whitelist);
+  }
   if (!filesWhitelist || !filesWhitelist.length) {
     console.error(
-      `Error: No files match the glob pattern you provided for --whitelist -> "${
+      `Error: No files match the glob pattern(s) you provided for --whitelist -> "${
         config.pattern
       }"`,
     );
