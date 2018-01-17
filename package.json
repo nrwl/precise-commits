@@ -48,6 +48,7 @@
   "jest": {
     "globalSetup": "<rootDir>/test/global-setup.js",
     "globalTeardown": "<rootDir>/test/global-teardown.js",
+    "watchPathIgnorePatterns": ["<rootDir>/tmp"],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },

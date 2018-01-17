@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, readdirSync } from 'fs';
-import { extname } from 'path';
+import { extname, join } from 'path';
+import { randomBytes } from 'crypto';
 
 import { runCommandSync } from '../src/utils';
 
@@ -37,15 +38,12 @@ class TmpFile {
 }
 
 export class TestBed {
-  private static readonly TMP_DIRECTORY_PATH = `${process.cwd()}/tmp`;
+  private static readonly TMP_DIRECTORY_PATH = join(process.cwd(), 'tmp');
   private TEST_BED_DIRECTORY_PATH: string;
   private fixtureToTmpFile = new Map<Fixture, TmpFile>();
 
-  constructor(private testBedName: string = `${Date.now()}`) {
-    this.TEST_BED_DIRECTORY_PATH = `${
-      TestBed.TMP_DIRECTORY_PATH
-    }/${testBedName}`;
-    runCommandSync('mkdir', [`./${testBedName}`], TestBed.TMP_DIRECTORY_PATH);
+  constructor() {
+    this.createUniqueDirectoryForTestBed();
   }
 
   getTmpFileForFixture(fixture: Fixture): TmpFile {
@@ -73,6 +71,16 @@ export class TestBed {
     this.applyCustomPrettierConfig(tmpFile, fixture.customPrettierConfig);
   }
 
+  private createUniqueDirectoryForTestBed(): void {
+    const dir = this.generateUniqueDirectoryName();
+    this.TEST_BED_DIRECTORY_PATH = join(TestBed.TMP_DIRECTORY_PATH, dir);
+    runCommandSync('mkdir', [dir], TestBed.TMP_DIRECTORY_PATH);
+  }
+
+  private generateUniqueDirectoryName(): string {
+    return randomBytes(20).toString('hex');
+  }
+
   private applyInitialAndStagedContentsOnDisk(tmpFile: TmpFile): void {
     /**
      * If we editing an existing `initial` file, we need to first create
@@ -87,12 +95,12 @@ export class TestBed {
   private createTmpFileForFixture(fixture: Fixture): TmpFile {
     const name = fixture.fixtureName;
     const filename = `${name}${fixture.fileExtension}`;
-    const directoryPath = `${this.TEST_BED_DIRECTORY_PATH}/${name}`;
+    const directoryPath = join(this.TEST_BED_DIRECTORY_PATH, name);
     return {
       name,
       filename,
       directoryPath,
-      path: `${directoryPath}/${filename}`,
+      path: join(directoryPath, filename),
       initialContents: fixture.initialContents,
       stagedContents: fixture.stagedContents,
     };
@@ -106,7 +114,7 @@ export class TestBed {
       return;
     }
     writeFileSync(
-      `${tmpFile.directoryPath}/${customPrettierConfig.filename}`,
+      join(tmpFile.directoryPath, customPrettierConfig.filename),
       customPrettierConfig.contents,
     );
   }
@@ -128,9 +136,11 @@ export class TestBed {
 }
 
 export function readFixtures(): Fixture[] {
-  const fixtures = readdirSync('./test/fixtures');
+  const fixturesDirPath = join(process.cwd(), 'test', 'fixtures');
+  const fixtures = readdirSync(fixturesDirPath);
   return fixtures.map(name => {
-    const files = readdirSync(`./test/fixtures/${name}`);
+    const fixtureDirPath = join(fixturesDirPath, name);
+    const files = readdirSync(fixtureDirPath);
     /**
      * Could have any of the file extensions supported by prettier
      */
@@ -139,9 +149,7 @@ export function readFixtures(): Fixture[] {
     const prettierConfigFileName = files.find(f => !!f.match(/prettierrc/));
 
     if (!stagedContentsFileName) {
-      throw new Error(
-        `"staged" file missing for fixture: ./test/fixtures/${name}`,
-      );
+      throw new Error(`"staged" file missing for fixture: ${fixtureDirPath}`);
     }
 
     return {
@@ -149,12 +157,9 @@ export function readFixtures(): Fixture[] {
       fileExtension: extname(stagedContentsFileName),
       initialContents: !initialContentsFileName
         ? null
-        : readFileSync(
-            `./test/fixtures/${name}/${initialContentsFileName}`,
-            'utf8',
-          ),
+        : readFileSync(join(fixtureDirPath, initialContentsFileName), 'utf8'),
       stagedContents: readFileSync(
-        `./test/fixtures/${name}/${stagedContentsFileName}`,
+        join(fixtureDirPath, stagedContentsFileName),
         'utf8',
       ),
       customPrettierConfig: !prettierConfigFileName
@@ -162,7 +167,7 @@ export function readFixtures(): Fixture[] {
         : <CustomPrettierConfig>{
             filename: prettierConfigFileName,
             contents: readFileSync(
-              `./test/fixtures/${name}/${prettierConfigFileName}`,
+              join(fixtureDirPath, prettierConfigFileName),
               'utf8',
             ),
           },
