@@ -60,6 +60,17 @@ export function checkRangesWithinContents(
   });
 }
 
+/**
+ * Return true if the full fileContents is already formatted according
+ * to the given prettierConfig
+ */
+export function isAlreadyFormatted(
+  fileContents: string,
+  prettierConfig: Options | null,
+): boolean {
+  return check(fileContents, { ...prettierConfig });
+}
+
 let PRETTIER_SUPPORTED_FILE_EXTENSIONS: string[] = [];
 getSupportInfo().languages.forEach(language => {
   PRETTIER_SUPPORTED_FILE_EXTENSIONS = [

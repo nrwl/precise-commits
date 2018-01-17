@@ -12,6 +12,7 @@ import {
   formatRangesWithinContents,
   resolvePrettierConfigForFile,
   checkRangesWithinContents,
+  isAlreadyFormatted,
 } from './prettier';
 
 export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
@@ -75,9 +76,23 @@ export function main(
       const fullPath = join(workingDirectory, filename);
       const diff = getDiffForFile(fullPath);
       /**
-       * Read the staged file contents
+       * Read the staged file contents and resolve the relevant prettier config
        */
       const fileContents = readFileSync(fullPath, 'utf8');
+      const prettierConfig = resolvePrettierConfigForFile(fullPath);
+      /**
+       * To avoid issues with 100% valid files producing issues when parts of them
+       * are reformatted in isolation, we need to first check the whole file
+       * to see if it is already formatted. This also allows us to skip unnecessary git
+       * diff analysis work.
+       */
+      if (isAlreadyFormatted(fileContents, prettierConfig)) {
+        return callbacks.onFinishedProcessingFile(
+          filename,
+          index,
+          'NOT_UPDATED',
+        );
+      }
       /**
        * Extract line change data from the git diff results
        */
@@ -108,7 +123,6 @@ export function main(
        * If `checkOnly` is set, only check to see if the formatting is valid,
        * otherwise automatically update the formatting.
        */
-      const prettierConfig = resolvePrettierConfigForFile(fullPath);
       /**
        * CHECK
        */

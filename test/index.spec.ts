@@ -23,4 +23,36 @@ describe('prettier-lines', () => {
       });
     });
   });
+
+  describe('main() - checkOnly: true', function() {
+    beforeAll(() => {
+      testBed = new TestBed();
+    });
+
+    fixtures.forEach(fixture => {
+      it(fixture.fixtureName, done => {
+        expect.assertions(1);
+        testBed.prepareFixtureInTmpDirectory(fixture);
+        const tmpFile = testBed.getTmpFileForFixture(fixture);
+        main(
+          tmpFile.directoryPath,
+          { checkOnly: true },
+          {
+            onInit() {},
+            onBegunProcessingFile() {},
+            onModifiedFilesDetected() {},
+            onFinishedProcessingFile(_fn, _i, status) {
+              expect(status).toEqual('INVALID_FORMATTING');
+            },
+            onComplete() {
+              done();
+            },
+            onError(err) {
+              done.fail(err);
+            },
+          },
+        );
+      });
+    });
+  });
 });
