@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { getDiffForFile, getStagedModifiedFiles } from './git-utils';
+import { getDiffForFile, getRelevantModifiedFiles } from './git-utils';
 import {
   extractLineChangeData,
   calculateCharacterRangesFromLineChanges,
@@ -66,7 +66,7 @@ export function main(
   try {
     callbacks.onInit(workingDirectory);
 
-    const modifiedFilenames = getStagedModifiedFiles(workingDirectory);
+    const modifiedFilenames = getRelevantModifiedFiles(workingDirectory);
     callbacks.onModifiedFilesDetected(modifiedFilenames);
     const totalFiles = modifiedFilenames.length;
 

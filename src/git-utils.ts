@@ -46,43 +46,71 @@ const DIFF_INDEX_FILTER = 'ACDMRTUXB';
 const SPECIAL_EMPTY_TREE_COMMIT_HASH =
   '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
-export function getStagedModifiedFiles(workingDirectory: string): string[] {
+export function getRelevantModifiedFiles(
+  workingDirectory: string,
+  sha1?: string,
+  sha2?: string,
+): string[] {
+  /**
+   * Resolve the relevant .git directory
+   */
   const gitDirectoryPath = resolveNearestGitDirectory(workingDirectory);
   if (!gitDirectoryPath) {
     throw new Error('No .git directory found');
   }
   const gitDirectoryParent = dirname(gitDirectoryPath);
-  let head: string = '';
-  try {
-    head = runCommandSync(
-      'git',
-      ['rev-parse', '--verify', 'HEAD'],
-      gitDirectoryParent,
-    ).stdout.replace('\n', '');
-  } catch (err) {
+  let diffIndexOutput: string;
+  if (sha1 && sha2) {
     /**
-     * If there has never been a commit before, there will be no HEAD to compare
-     * to. Use the special empty tree hash value instead:
-     * https://stackoverflow.com/questions/9765453/is-gits-semi-secret-empty-tree-object-reliable-and-why-is-there-not-a-symbolic
+     * We are grabbing the files between the two given commit SHAs
      */
-    if (err.message.includes(`fatal: Needed a single revision`)) {
-      head = SPECIAL_EMPTY_TREE_COMMIT_HASH;
-    } else {
-      throw err;
+    diffIndexOutput = runCommandSync(
+      'git',
+      [
+        'diff',
+        '--name-status',
+        `--diff-filter=${DIFF_INDEX_FILTER}`,
+        sha1,
+        sha2,
+      ],
+      gitDirectoryParent,
+    ).stdout;
+  } else {
+    /**
+     * No commit SHAs given, we assume we are attempting to evaluate staged files,
+     * and so need to determine if there is HEAD SHA available.
+     */
+    let head: string = '';
+    try {
+      head = runCommandSync(
+        'git',
+        ['rev-parse', '--verify', 'HEAD'],
+        gitDirectoryParent,
+      ).stdout.replace('\n', '');
+    } catch (err) {
+      /**
+       * If there has never been a commit before, there will be no HEAD to compare
+       * to. Use the special empty tree hash value instead:
+       * https://stackoverflow.com/questions/9765453/is-gits-semi-secret-empty-tree-object-reliable-and-why-is-there-not-a-symbolic
+       */
+      if (err.message.includes(`fatal: Needed a single revision`)) {
+        head = SPECIAL_EMPTY_TREE_COMMIT_HASH;
+      } else {
+        throw err;
+      }
     }
+    diffIndexOutput = runCommandSync(
+      'git',
+      [
+        'diff-index',
+        '--cached',
+        '--name-status',
+        `--diff-filter=${DIFF_INDEX_FILTER}`,
+        head,
+      ],
+      gitDirectoryParent,
+    ).stdout;
   }
-
-  const diffIndexOutput = runCommandSync(
-    'git',
-    [
-      'diff-index',
-      '--cached',
-      '--name-status',
-      `--diff-filter=${DIFF_INDEX_FILTER}`,
-      head,
-    ],
-    gitDirectoryParent,
-  ).stdout;
   const files = parseDiffIndexOutput(diffIndexOutput);
   /**
    * We fundamentally check whether or not the file extensions are supported by prettier,

@@ -4,7 +4,7 @@ import { TestBed, readFixtures } from './test-utils';
 import {
   getDiffForFile,
   resolveNearestGitDirectory,
-  getStagedModifiedFiles,
+  getRelevantModifiedFiles,
 } from '../src/git-utils';
 
 const fixtures = readFixtures();
@@ -51,7 +51,7 @@ describe('git-utils', () => {
     });
   });
 
-  describe('getStagedModifiedFiles()', () => {
+  describe('getRelevantModifiedFiles()', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
@@ -60,7 +60,7 @@ describe('git-utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const fileNames = getStagedModifiedFiles(tmpFile.directoryPath);
+        const fileNames = getRelevantModifiedFiles(tmpFile.directoryPath);
         expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });
     });
