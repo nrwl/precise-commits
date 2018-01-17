@@ -17,7 +17,12 @@ describe('prettier-lines', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        main(tmpFile.directoryPath, { checkOnly: false, filesWhitelist: null });
+        main(tmpFile.directoryPath, {
+          checkOnly: false,
+          filesWhitelist: null,
+          sha1: null,
+          sha2: null,
+        });
         const formatted = readFileSync(tmpFile.path, 'utf8');
         expect(formatted).toMatchSnapshot();
       });
@@ -36,7 +41,7 @@ describe('prettier-lines', () => {
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         main(
           tmpFile.directoryPath,
-          { checkOnly: true, filesWhitelist: null },
+          { checkOnly: true, filesWhitelist: null, sha1: null, sha2: null },
           {
             onInit() {},
             onBegunProcessingFile() {},

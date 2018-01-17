@@ -20,6 +20,8 @@ export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
 export interface AdditionalOptions {
   checkOnly: boolean;
   filesWhitelist: string[] | null;
+  sha1: string | null;
+  sha2: string | null;
 }
 
 export interface Callbacks {
@@ -41,6 +43,9 @@ export interface Callbacks {
 
 function applyDefaults(options: AdditionalOptions): AdditionalOptions {
   options = options || {};
+  options.filesWhitelist = null;
+  options.sha1 = null;
+  options.sha2 = null;
   options.checkOnly = !!options.checkOnly;
   return options;
 }
@@ -63,13 +68,15 @@ export function main(
   /**
    * Apply default options
    */
-  const { checkOnly, filesWhitelist } = applyDefaults(options);
+  const { checkOnly, filesWhitelist, sha1, sha2 } = applyDefaults(options);
   try {
     callbacks.onInit(workingDirectory);
 
     const modifiedFilenames = getRelevantModifiedFiles(
       workingDirectory,
       filesWhitelist,
+      sha1,
+      sha2,
     );
     callbacks.onModifiedFilesDetected(modifiedFilenames);
     const totalFiles = modifiedFilenames.length;

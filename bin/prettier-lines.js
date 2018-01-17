@@ -29,9 +29,23 @@ if (config.whitelist) {
   }
 }
 
+/**
+ * If the user specifies at least one SHA, make sure they provide two
+ */
+if (config.sha1 || config.sha2) {
+  if (!(config.sha1 && config.sha2)) {
+    console.error(
+      `Error: When filtering between commit SHAs you must provide both --sha1 and --sha2`,
+    );
+    return process.exit(1);
+  }
+}
+
 const options = {
   checkOnly: config['check-only'] || false,
   filesWhitelist,
+  sha1: config.sha1 || null,
+  sha2: config.sha2 || null,
 };
 
 const primarySpinner = ora(' Running prettier-lines...');

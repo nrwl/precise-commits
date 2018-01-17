@@ -60,7 +60,12 @@ describe('git-utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const fileNames = getRelevantModifiedFiles(tmpFile.directoryPath, null);
+        const fileNames = getRelevantModifiedFiles(
+          tmpFile.directoryPath,
+          null,
+          null,
+          null,
+        );
         expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });
     });

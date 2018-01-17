@@ -49,8 +49,8 @@ const SPECIAL_EMPTY_TREE_COMMIT_HASH =
 export function getRelevantModifiedFiles(
   workingDirectory: string,
   filesWhitelist: string[] | null,
-  sha1?: string,
-  sha2?: string,
+  sha1: string | null,
+  sha2: string | null,
 ): string[] {
   /**
    * Resolve the relevant .git directory
