@@ -19,6 +19,7 @@ export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
 
 export interface AdditionalOptions {
   checkOnly: boolean;
+  filesWhitelist: string[] | null;
 }
 
 export interface Callbacks {
@@ -62,11 +63,14 @@ export function main(
   /**
    * Apply default options
    */
-  const { checkOnly } = applyDefaults(options);
+  const { checkOnly, filesWhitelist } = applyDefaults(options);
   try {
     callbacks.onInit(workingDirectory);
 
-    const modifiedFilenames = getRelevantModifiedFiles(workingDirectory);
+    const modifiedFilenames = getRelevantModifiedFiles(
+      workingDirectory,
+      filesWhitelist,
+    );
     callbacks.onModifiedFilesDetected(modifiedFilenames);
     const totalFiles = modifiedFilenames.length;
 

@@ -48,6 +48,7 @@ const SPECIAL_EMPTY_TREE_COMMIT_HASH =
 
 export function getRelevantModifiedFiles(
   workingDirectory: string,
+  filesWhitelist: string[] | null,
   sha1?: string,
   sha2?: string,
 ): string[] {
@@ -111,15 +112,26 @@ export function getRelevantModifiedFiles(
       gitDirectoryParent,
     ).stdout;
   }
-  const files = parseDiffIndexOutput(diffIndexOutput);
+  const allFiles = parseDiffIndexOutput(diffIndexOutput);
   /**
    * We fundamentally check whether or not the file extensions are supported by prettier,
-   * and that the user has not chosen to ignore them via a .prettierignore file.
+   * whether or not they are included in the optional `filesWhitelist` array, and that the user
+   * has not chosen to ignore them via a .prettierignore file.
    */
-  return files
+  return allFiles
     .map(r => r.filename)
     .filter(hasPrettierSupportedFileExtension)
+    .filter(generateFilesWhitelistPredicate(filesWhitelist))
     .filter(generatePrettierIgnorePredicate(workingDirectory));
+}
+
+function generateFilesWhitelistPredicate(
+  filesWhitelist: string[] | null,
+): (file: string) => boolean {
+  if (!filesWhitelist) {
+    return () => true;
+  }
+  return file => !filesWhitelist.includes(file);
 }
 
 function parseDiffIndexOutput(stdout: string): DiffIndexFile[] {

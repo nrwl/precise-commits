@@ -7,31 +7,50 @@
  */
 const ora = require('ora');
 const mri = require('mri');
+const glob = require('glob');
 
 const prettierLines = require('../lib').main;
-
-const primarySpinner = ora(' Running prettier-lines...');
-const stagedFileSpinner = ora(' Detecting staged files...');
-const spinnersByFilename = {};
-
 const config = mri(process.argv.slice(2));
+
+/**
+ * If the user provided a glob pattern to match against, ensure that there are
+ * applicable files available
+ */
+let filesWhitelist = null;
+if (config.whitelist) {
+  filesWhitelist = glob.sync(config.whitelist);
+  if (!filesWhitelist || !filesWhitelist.length) {
+    console.error(
+      `Error: No files match the glob pattern you provided for --whitelist -> "${
+        config.pattern
+      }"`,
+    );
+    return process.exit(1);
+  }
+}
+
 const options = {
   checkOnly: config['check-only'] || false,
+  filesWhitelist,
 };
+
+const primarySpinner = ora(' Running prettier-lines...');
+const modifiedFilesSpinner = ora(' Detecting modified files from git...');
+const spinnersByFilename = {};
 
 let shouldErrorOut = false;
 
 prettierLines(process.cwd(), options, {
   onInit(workingDirectory) {
     primarySpinner.start();
-    stagedFileSpinner.start();
+    modifiedFilesSpinner.start();
   },
   onModifiedFilesDetected(modifiedFilenames) {
     if (!modifiedFilenames || !modifiedFilenames.length) {
       return;
     }
-    stagedFileSpinner.succeed(
-      ` ${modifiedFilenames.length} staged file(s) found`,
+    modifiedFilesSpinner.succeed(
+      ` ${modifiedFilenames.length} modified file(s) found`,
     );
   },
   onBegunProcessingFile(filename, index, totalFiles) {
@@ -58,12 +77,12 @@ prettierLines(process.cwd(), options, {
         if (options.checkOnly) {
           shouldErrorOut = true;
         }
-        spinner.info(`       --> Invalid formatting detected in: ${filename}`);
+        spinner.fail(`       --> Invalid formatting detected in: ${filename}`);
         break;
     }
   },
   onError(err) {
-    stagedFileSpinner.fail(' prettier-lines: An Error occurred\n');
+    modifiedFilesSpinner.fail(' prettier-lines: An Error occurred\n');
     console.error(err);
     console.log('\n');
     primarySpinner.stop();
@@ -71,8 +90,8 @@ prettierLines(process.cwd(), options, {
   },
   onComplete(totalFiles) {
     if (!totalFiles) {
-      stagedFileSpinner.info(
-        ` prettier-lines: No staged files detected.
+      modifiedFilesSpinner.info(
+        ` prettier-lines: No matching modified files detected.
         
   --> If you feel that one or more files should be showing up here, be sure to first check what file extensions prettier supports, and whether or not you have included those files in a .prettierignore file
 
