@@ -131,7 +131,7 @@ function generateFilesWhitelistPredicate(
   if (!filesWhitelist) {
     return () => true;
   }
-  return file => !filesWhitelist.includes(file);
+  return file => filesWhitelist.includes(file);
 }
 
 function parseDiffIndexOutput(stdout: string): DiffIndexFile[] {

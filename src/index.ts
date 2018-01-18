@@ -43,9 +43,9 @@ export interface Callbacks {
 
 function applyDefaults(options: AdditionalOptions): AdditionalOptions {
   options = options || {};
-  options.filesWhitelist = null;
-  options.sha1 = null;
-  options.sha2 = null;
+  options.filesWhitelist = options.filesWhitelist || null;
+  options.sha1 = options.sha1 || null;
+  options.sha2 = options.sha2 || null;
   options.checkOnly = !!options.checkOnly;
   return options;
 }

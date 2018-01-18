@@ -111,13 +111,11 @@ prettierLines(process.cwd(), options, {
   },
   onComplete(totalFiles) {
     if (!totalFiles) {
-      modifiedFilesSpinner.info(
-        ` prettier-lines: No matching modified files detected.
+      modifiedFilesSpinner.info(` prettier-lines: No matching modified files detected.
         
   --> If you feel that one or more files should be showing up here, be sure to first check what file extensions prettier supports, and whether or not you have included those files in a .prettierignore file
 
-        `,
-      );
+        `);
       primarySpinner.stop();
       return process.exit(shouldErrorOut ? 1 : 0);
     }
