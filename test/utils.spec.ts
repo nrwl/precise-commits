@@ -18,7 +18,11 @@ describe('utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const diff = getDiffForFile(tmpFile.path);
+        const diff = getDiffForFile(
+          tmpFile.path,
+          tmpFile.initialCommitSHA,
+          tmpFile.updatedCommitSHA,
+        );
         const lineChangeData = extractLineChangeData(diff);
         expect(lineChangeData).toMatchSnapshot();
       });
@@ -34,7 +38,11 @@ describe('utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const diff = getDiffForFile(tmpFile.path);
+        const diff = getDiffForFile(
+          tmpFile.path,
+          tmpFile.initialCommitSHA,
+          tmpFile.updatedCommitSHA,
+        );
         const lineChangeData = extractLineChangeData(diff);
         const characterRanges = calculateCharacterRangesFromLineChanges(
           lineChangeData,

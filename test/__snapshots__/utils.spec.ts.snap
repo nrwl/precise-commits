@@ -18,6 +18,23 @@ Array [
 ]
 `;
 
+exports[`utils calculateCharacterRangesFromLineChanges() multi-range-regression 1`] = `
+Array [
+  Object {
+    "rangeEnd": 847,
+    "rangeStart": 811,
+  },
+  Object {
+    "rangeEnd": 914,
+    "rangeStart": 878,
+  },
+  Object {
+    "rangeEnd": 2928,
+    "rangeStart": 2171,
+  },
+]
+`;
+
 exports[`utils calculateCharacterRangesFromLineChanges() multiple-updated-lines-javascript-file 1`] = `
 Array [
   Object {
@@ -61,6 +78,35 @@ Object {
     },
   ],
   "removals": Array [],
+}
+`;
+
+exports[`utils extractLineChangeData() multi-range-regression 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 32,
+    },
+    Object {
+      "noOfLines": 1,
+      "start": 35,
+    },
+    Object {
+      "noOfLines": 33,
+      "start": 82,
+    },
+  ],
+  "removals": Array [
+    Object {
+      "noOfLines": 1,
+      "start": 32,
+    },
+    Object {
+      "noOfLines": 1,
+      "start": 35,
+    },
+  ],
 }
 `;
 

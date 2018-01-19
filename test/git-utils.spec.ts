@@ -45,7 +45,11 @@ describe('git-utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const diff = getDiffForFile(tmpFile.path);
+        const diff = getDiffForFile(
+          tmpFile.path,
+          tmpFile.initialCommitSHA,
+          tmpFile.updatedCommitSHA,
+        );
         expect(diff).toMatchSnapshot();
       });
     });
@@ -63,8 +67,8 @@ describe('git-utils', () => {
         const fileNames = getRelevantModifiedFiles(
           tmpFile.directoryPath,
           null,
-          null,
-          null,
+          tmpFile.initialCommitSHA,
+          tmpFile.updatedCommitSHA,
         );
         expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });

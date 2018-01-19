@@ -16,6 +16,14 @@ Object {
 }
 `;
 
+exports[`prettier resolvePrettierConfigForFile() multi-range-regression 1`] = `
+Object {
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+}
+`;
+
 exports[`prettier resolvePrettierConfigForFile() multiple-updated-lines-javascript-file 1`] = `
 Object {
   "semi": true,

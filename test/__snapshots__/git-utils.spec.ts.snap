@@ -43,6 +43,53 @@ index 0000000..3772dd0
 \\\\ No newline at end of file"
 `;
 
+exports[`git-utils getDiffForFile() multi-range-regression 1`] = `
+"diff --git a/multi-range-regression.ts b/multi-range-regression.ts
+index 7167118..6187e4d 100644
+--- a/multi-range-regression.ts
++++ b/multi-range-regression.ts
+@@ -32 +32 @@ export function format(args: string[]) {
+-      write(patterns);
++      writePrettierLines(patterns);
+@@ -35 +35 @@ export function format(args: string[]) {
+-      check(patterns);
++      checkPrettierLines(patterns);
+@@ -81,0 +82,33 @@ function prettierPath() {
++
++
++function writePrettierLines(patterns: string[]) {
++  if (patterns.length > 0) {
++    let cmd = \`node \${prettierLinesPath()}\`;
++    patterns.forEach(pattern => {
++      cmd += \` --whitelist=\\"\${pattern}\\"\`;
++    });
++    execSync(cmd, {
++      stdio: [0, 1, 2]
++    });
++  }
++}
++
++function checkPrettierLines(patterns: string[]) {
++  if (patterns.length > 0) {
++    try {
++      let cmd = \`node \${prettierLinesPath()} --check-only\`;
++      patterns.forEach(pattern => {
++        cmd += \` --whitelist=\\"\${pattern}\\"\`;
++      });
++      execSync(cmd, {
++        stdio: [0, 1, 2]
++      });
++    } catch (e) {
++      process.exit(1);
++    }
++  }
++}
++
++function prettierLinesPath() {
++  return \`\${path.dirname(resolve.sync('prettier-lines', { basedir: __dirname }))}/bin/prettier-lines.js\`;
++}"
+`;
+
 exports[`git-utils getDiffForFile() multiple-updated-lines-javascript-file 1`] = `
 "diff --git a/multiple-updated-lines-javascript-file.js b/multiple-updated-lines-javascript-file.js
 index 50d7ab7..2b98ecd 100644

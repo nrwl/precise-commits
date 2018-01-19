@@ -3,6 +3,7 @@ import { extname, join } from 'path';
 import { randomBytes } from 'crypto';
 
 import { runCommandSync } from '../src/utils';
+import { AdditionalOptions } from '../lib/index';
 
 export interface Fixture {
   fixtureName: string;
@@ -16,6 +17,7 @@ export interface Fixture {
    * The file as it stands after `git add`, but before formatting
    */
   stagedContents: string;
+  committed: boolean;
   /**
    * Optional prettier config overrides specified inline in the
    * fixture directory
@@ -34,6 +36,9 @@ class TmpFile {
   directoryPath: string;
   initialContents?: string;
   stagedContents: string;
+  committed: boolean;
+  initialCommitSHA: string | null;
+  updatedCommitSHA: string | null;
   path: string;
 }
 
@@ -90,6 +95,18 @@ export class TestBed {
       this.createAndCommitTmpFileOnDisk(tmpFile);
     }
     this.stageGivenChangesToTmpFileOnDisk(tmpFile);
+    if (tmpFile.committed) {
+      runCommandSync(
+        'git',
+        ['commit', '-m', `committing updates to ${tmpFile.path}]`],
+        tmpFile.directoryPath,
+      );
+      tmpFile.updatedCommitSHA = runCommandSync(
+        'git',
+        ['rev-parse', 'HEAD'],
+        tmpFile.directoryPath,
+      ).stdout.trim();
+    }
   }
 
   private createTmpFileForFixture(fixture: Fixture): TmpFile {
@@ -103,6 +120,9 @@ export class TestBed {
       path: join(directoryPath, filename),
       initialContents: fixture.initialContents,
       stagedContents: fixture.stagedContents,
+      committed: fixture.committed,
+      initialCommitSHA: null,
+      updatedCommitSHA: null,
     };
   }
 
@@ -127,6 +147,13 @@ export class TestBed {
       ['commit', '-m', `adding initial contents for ${tmpFile.path}`],
       tmpFile.directoryPath,
     );
+    if (tmpFile.committed) {
+      tmpFile.initialCommitSHA = runCommandSync(
+        'git',
+        ['rev-parse', 'HEAD'],
+        tmpFile.directoryPath,
+      ).stdout.trim();
+    }
   }
 
   private stageGivenChangesToTmpFileOnDisk(tmpFile: TmpFile): void {
@@ -146,22 +173,33 @@ export function readFixtures(): Fixture[] {
      */
     const initialContentsFileName = files.find(f => !!f.match(/initial/));
     const stagedContentsFileName = files.find(f => !!f.match(/staged/));
+    const committedContentsFileName = files.find(f => !!f.match(/committed/));
     const prettierConfigFileName = files.find(f => !!f.match(/prettierrc/));
 
-    if (!stagedContentsFileName) {
-      throw new Error(`"staged" file missing for fixture: ${fixtureDirPath}`);
+    if (!stagedContentsFileName && !committedContentsFileName) {
+      throw new Error(
+        `"staged" or "committed" file missing for fixture: ${fixtureDirPath}`,
+      );
+    }
+
+    if (stagedContentsFileName && committedContentsFileName) {
+      throw new Error(
+        `"staged" and "committed" files cannot be used together - fixture: ${fixtureDirPath}`,
+      );
     }
 
     return {
       fixtureName: name,
-      fileExtension: extname(stagedContentsFileName),
+      fileExtension: extname(
+        stagedContentsFileName || committedContentsFileName,
+      ),
       initialContents: !initialContentsFileName
         ? null
         : readFileSync(join(fixtureDirPath, initialContentsFileName), 'utf8'),
-      stagedContents: readFileSync(
-        join(fixtureDirPath, stagedContentsFileName),
-        'utf8',
-      ),
+      stagedContents: stagedContentsFileName
+        ? readFileSync(join(fixtureDirPath, stagedContentsFileName), 'utf8')
+        : readFileSync(join(fixtureDirPath, committedContentsFileName), 'utf8'),
+      committed: !!committedContentsFileName,
       customPrettierConfig: !prettierConfigFileName
         ? null
         : <CustomPrettierConfig>{
@@ -173,4 +211,21 @@ export function readFixtures(): Fixture[] {
           },
     };
   });
+}
+
+export function mergeOptionsForTmpFile(
+  options: Partial<AdditionalOptions>,
+  tmpFile: TmpFile,
+): AdditionalOptions {
+  const shaOptions = tmpFile.committed
+    ? {
+        sha1: tmpFile.initialCommitSHA,
+        sha2: tmpFile.updatedCommitSHA,
+      }
+    : { sha1: null, sha2: null };
+
+  return <AdditionalOptions>{
+    ...options,
+    ...shaOptions,
+  };
 }
