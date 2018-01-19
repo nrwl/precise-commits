@@ -16,7 +16,18 @@ export function resolveNearestGitDirectory(workingDirectory: string) {
   return findUpSync('.git', { cwd: workingDirectory });
 }
 
-export function getDiffForFile(filename: string): string {
+export function getDiffForFile(
+  filename: string,
+  sha1: string | null,
+  sha2: string | null,
+): string {
+  if (sha1 && sha2) {
+    return runCommandSync(
+      'git',
+      ['diff', '--unified=0', sha1, sha2, filename],
+      dirname(filename),
+    ).stdout;
+  }
   return runCommandSync(
     'git',
     ['diff', '--unified=0', '--cached', filename],

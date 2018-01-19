@@ -85,7 +85,6 @@ export function main(
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
 
       const fullPath = join(workingDirectory, filename);
-      const diff = getDiffForFile(fullPath);
       /**
        * Read the staged file contents and resolve the relevant prettier config
        */
@@ -107,6 +106,7 @@ export function main(
       /**
        * Extract line change data from the git diff results
        */
+      const diff = getDiffForFile(fullPath, sha1, sha2);
       let lineChangeData: LineChangeData = { additions: [], removals: [] };
       try {
         lineChangeData = extractLineChangeData(diff);
