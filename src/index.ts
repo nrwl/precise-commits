@@ -83,7 +83,6 @@ export function main(
 
     modifiedFilenames.forEach((filename, index) => {
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
-
       const fullPath = join(workingDirectory, filename);
       /**
        * Read the staged file contents and resolve the relevant prettier config
@@ -91,8 +90,8 @@ export function main(
       const fileContents = readFileSync(fullPath, 'utf8');
       const prettierConfig = resolvePrettierConfigForFile(fullPath);
       /**
-       * To avoid issues with 100% valid files producing issues when parts of them
-       * are reformatted in isolation, we need to first check the whole file
+       * To avoid unnecessary issues with 100% valid files producing issues when parts
+       * of them are reformatted in isolation, we need to first check the whole file
        * to see if it is already formatted. This also allows us to skip unnecessary git
        * diff analysis work.
        */
