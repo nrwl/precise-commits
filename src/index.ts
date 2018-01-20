@@ -1,19 +1,8 @@
-import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { getDiffForFile, getRelevantModifiedFiles } from './git-utils';
-import {
-  extractLineChangeData,
-  calculateCharacterRangesFromLineChanges,
-  NO_LINE_CHANGE_DATA_ERROR,
-  LineChangeData,
-} from './utils';
-import {
-  formatRangesWithinContents,
-  resolvePrettierConfigForFile,
-  checkRangesWithinContents,
-  isAlreadyFormatted,
-} from './prettier';
+import { getRelevantModifiedFiles } from './git-utils';
+import { NO_LINE_CHANGE_DATA_ERROR } from './utils';
+import { ModifiedFile } from './modified-file';
 
 export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
 
@@ -85,17 +74,16 @@ export function main(
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
       const fullPath = join(workingDirectory, filename);
       /**
-       * Read the staged file contents and resolve the relevant prettier config
+       * Read the modified file contents and resolve the relevant prettier config
        */
-      const fileContents = readFileSync(fullPath, 'utf8');
-      const prettierConfig = resolvePrettierConfigForFile(fullPath);
+      const modifiedFile = new ModifiedFile(fullPath, sha1, sha2);
       /**
        * To avoid unnecessary issues with 100% valid files producing issues when parts
-       * of them are reformatted in isolation, we need to first check the whole file
-       * to see if it is already formatted. This also allows us to skip unnecessary git
-       * diff analysis work.
+       * of them are reformatted in isolation, we first check the whole file to see if
+       * it is already formatted. This also allows us to skip unnecessary git diff
+       * analysis work.
        */
-      if (isAlreadyFormatted(fileContents, prettierConfig)) {
+      if (modifiedFile.isAlreadyFormatted()) {
         return callbacks.onFinishedProcessingFile(
           filename,
           index,
@@ -103,13 +91,12 @@ export function main(
         );
       }
       /**
-       * Extract line change data from the git diff results
+       * Calculate what character ranges have been affected in the modified file.
+       * If any of the analysis threw an error for any reason, it will be returned
+       * from the method so we can handle it here.
        */
-      const diff = getDiffForFile(fullPath, sha1, sha2);
-      let lineChangeData: LineChangeData = { additions: [], removals: [] };
-      try {
-        lineChangeData = extractLineChangeData(diff);
-      } catch (err) {
+      const { err } = modifiedFile.calculateModifiedCharacterRanges();
+      if (err) {
         if (err.message === NO_LINE_CHANGE_DATA_ERROR) {
           return callbacks.onFinishedProcessingFile(
             filename,
@@ -120,45 +107,28 @@ export function main(
         throw err;
       }
       /**
-       * Convert the line change data into character data
-       */
-      const characterRanges = calculateCharacterRangesFromLineChanges(
-        lineChangeData,
-        fileContents,
-      );
-      /**
-       * Run prettier on the file, multiple times if required, instructing it
-       * to only focus on the calculated range(s).
-       *
-       * If `checkOnly` is set, only check to see if the formatting is valid,
-       * otherwise automatically update the formatting.
-       */
-      /**
-       * CHECK
+       * CHECK ONLY
        */
       if (checkOnly) {
-        const isValid = checkRangesWithinContents(
-          characterRanges,
-          fileContents,
-          prettierConfig,
-        );
-        if (!isValid) {
+        if (!modifiedFile.hasValidFormattingForCharacterRanges()) {
           return callbacks.onFinishedProcessingFile(
             filename,
             index,
             'INVALID_FORMATTING',
+          );
+        } else {
+          return callbacks.onFinishedProcessingFile(
+            filename,
+            index,
+            'NOT_UPDATED',
           );
         }
       }
       /**
        * FORMAT
        */
-      const formattedFileContents = formatRangesWithinContents(
-        characterRanges,
-        fileContents,
-        prettierConfig,
-      );
-      if (formattedFileContents === fileContents) {
+      modifiedFile.formatCharacterRangesWithinContents();
+      if (!modifiedFile.shouldContentsBeUpdatedOnDisk()) {
         return callbacks.onFinishedProcessingFile(
           filename,
           index,
@@ -168,7 +138,7 @@ export function main(
       /**
        * Write the file back to disk
        */
-      writeFileSync(fullPath, formattedFileContents);
+      modifiedFile.updateFileOnDisk();
       return callbacks.onFinishedProcessingFile(filename, index, 'UPDATED');
     });
 

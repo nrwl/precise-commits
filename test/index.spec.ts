@@ -8,7 +8,7 @@ const fixtures = readFixtures();
 let testBed: TestBed;
 
 describe('prettier-lines', () => {
-  describe('main()', function() {
+  describe('main()', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
@@ -28,7 +28,7 @@ describe('prettier-lines', () => {
     });
   });
 
-  describe('main() - checkOnly: true', function() {
+  describe('main() - checkOnly: true', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
