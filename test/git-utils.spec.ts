@@ -6,6 +6,7 @@ import {
   resolveNearestGitDirectory,
   getRelevantModifiedFiles,
 } from '../src/git-utils';
+import { preciseFormatterPrettier } from '../src/precise-formatters/prettier';
 
 const fixtures = readFixtures();
 let testBed: TestBed;
@@ -69,6 +70,8 @@ describe('git-utils', () => {
           null,
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,
+          preciseFormatterPrettier.hasSupportedFileExtension,
+          preciseFormatterPrettier.generateIgnoreFilePredicate,
         );
         expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });

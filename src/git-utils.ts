@@ -2,10 +2,6 @@ import { sync as findUpSync } from 'find-up';
 import { dirname } from 'path';
 
 import { runCommandSync } from './utils';
-import {
-  hasPrettierSupportedFileExtension,
-  generatePrettierIgnorePredicate,
-} from './prettier';
 
 interface DiffIndexFile {
   diffFilterChar: string;
@@ -62,6 +58,10 @@ export function getRelevantModifiedFiles(
   filesWhitelist: string[] | null,
   sha1: string | null,
   sha2: string | null,
+  hasSupportedFileExtension: (filename: string) => boolean,
+  generateIgnoreFilePredicate: (
+    workingDirectory: string,
+  ) => (filename: string) => boolean,
 ): string[] {
   /**
    * Resolve the relevant .git directory
@@ -125,15 +125,15 @@ export function getRelevantModifiedFiles(
   }
   const allFiles = parseDiffIndexOutput(diffIndexOutput);
   /**
-   * We fundamentally check whether or not the file extensions are supported by prettier,
+   * We fundamentally check whether or not the file extensions are supported by the given formatter,
    * whether or not they are included in the optional `filesWhitelist` array, and that the user
-   * has not chosen to ignore them via a .prettierignore file.
+   * has not chosen to ignore them via any supported "ignore" mechanism of the formatter.
    */
   return allFiles
     .map(r => r.filename)
-    .filter(hasPrettierSupportedFileExtension)
+    .filter(hasSupportedFileExtension)
     .filter(generateFilesWhitelistPredicate(filesWhitelist))
-    .filter(generatePrettierIgnorePredicate(workingDirectory));
+    .filter(generateIgnoreFilePredicate(workingDirectory));
 }
 
 function generateFilesWhitelistPredicate(

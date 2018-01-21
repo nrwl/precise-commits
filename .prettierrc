@@ -1,5 +1,13 @@
 {
   "semi": true,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": "bin/prettier-lines.js",
+      "options": {
+        "trailingComma": "es5"
+      }
+    }
+  ]
 }

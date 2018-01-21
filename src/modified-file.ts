@@ -1,76 +1,84 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { Options } from 'prettier';
 
-import {
-  isAlreadyFormatted,
-  resolvePrettierConfigForFile,
-  checkRangesWithinContents,
-  formatRangesWithinContents,
-} from './prettier';
 import {
   CharacterRange,
   extractLineChangeData,
   calculateCharacterRangesFromLineChanges,
 } from './utils';
 import { getDiffForFile } from './git-utils';
+import { PreciseFormatter } from './precise-formatter';
+
+export interface ModifiedFileConfig {
+  fullPath: string;
+  sha1: string | null;
+  sha2: string | null;
+  preciseFormatter: PreciseFormatter<any>;
+}
 
 export class ModifiedFile {
+  private fullPath: string;
+  private sha1: string | null;
+  private sha2: string | null;
+  private preciseFormatter: PreciseFormatter<any>;
   /**
    * The contents of the file in their current state on the user's file
    * system
    */
-  private fileContents: string;
+  public fileContents: string;
   /**
-   * The final file contents, after we've run prettier
+   * The final file contents, after we've run the formatter
    */
   private formattedFileContents: string;
   /**
-   * The resolved prettier config which applies to this file
+   * The resolved formatter config which applies to this file
    */
-  private prettierConfig: Options | null;
+  private formatterConfig: object | null;
   /**
    * The calculated character ranges which have been modified
    * within this file
    */
   private modifiedCharacterRanges: CharacterRange[] = [];
 
-  constructor(
-    private fullPath: string,
-    private sha1: string | null,
-    private sha2: string | null,
-  ) {
+  constructor({ fullPath, sha1, sha2, preciseFormatter }: ModifiedFileConfig) {
+    this.fullPath = fullPath;
+    this.sha1 = sha1;
+    this.sha2 = sha2;
+    this.preciseFormatter = preciseFormatter;
     this.resolveFileContents();
-    this.resolvePrettierConfig();
+    this.resolveFormatterConfig();
   }
 
   /**
    * Return true if the whole file has already been formatted appropriately based on
-   * the resolved prettier config. We can use this as a check to skip unnecessary work.
+   * the resolved formatter config. We can use this as a check to skip unnecessary work.
    */
   isAlreadyFormatted(): boolean {
-    return isAlreadyFormatted(this.fileContents, this.prettierConfig);
-  }
-
-  /**
-   * Run prettier's check mode on the given ranges and return true if they are all
-   * already formatted appropriately based on the resolved prettier config.
-   */
-  hasValidFormattingForCharacterRanges(): boolean {
-    return checkRangesWithinContents(
-      this.modifiedCharacterRanges,
+    return this.preciseFormatter.isAlreadyFormatted(
       this.fileContents,
-      this.prettierConfig,
+      this.formatterConfig,
     );
   }
 
   /**
-   * Run prettier on the file contents and store the result
+   * Run the formatters check mode on the given ranges and return true if they are all
+   * already formatted appropriately based on the resolved formatter config.
+   */
+  hasValidFormattingForCharacterRanges(): boolean {
+    return this.preciseFormatter.checkFormattingOfRanges(
+      this.fileContents,
+      this.formatterConfig,
+      this.modifiedCharacterRanges,
+    );
+  }
+
+  /**
+   * Run the formatter on the file contents and store the result
    */
   formatCharacterRangesWithinContents(): void {
-    this.formattedFileContents = formatRangesWithinContents(
-      this.modifiedCharacterRanges,
+    this.formattedFileContents = this.preciseFormatter.formatRanges(
       this.fileContents,
-      this.prettierConfig,
+      this.formatterConfig,
+      this.modifiedCharacterRanges,
     );
   }
 
@@ -122,9 +130,9 @@ export class ModifiedFile {
   }
 
   /**
-   * Resolve and cache the relevant prettier config.
+   * Resolve and cache the relevant formatter config.
    */
-  private resolvePrettierConfig() {
-    this.prettierConfig = resolvePrettierConfigForFile(this.fullPath);
+  private resolveFormatterConfig() {
+    this.formatterConfig = this.preciseFormatter.resolveConfig(this.fullPath);
   }
 }

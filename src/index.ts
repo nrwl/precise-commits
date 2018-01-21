@@ -3,6 +3,7 @@ import { join } from 'path';
 import { getRelevantModifiedFiles } from './git-utils';
 import { NO_LINE_CHANGE_DATA_ERROR } from './utils';
 import { ModifiedFile } from './modified-file';
+import { preciseFormatterPrettier } from './precise-formatters/prettier';
 
 export type ProcessingStatus = 'NOT_UPDATED' | 'UPDATED' | 'INVALID_FORMATTING';
 
@@ -66,6 +67,8 @@ export function main(
       filesWhitelist,
       sha1,
       sha2,
+      preciseFormatterPrettier.hasSupportedFileExtension,
+      preciseFormatterPrettier.generateIgnoreFilePredicate,
     );
     const totalFiles = modifiedFilenames.length;
     callbacks.onModifiedFilesDetected(modifiedFilenames);
@@ -73,13 +76,14 @@ export function main(
     modifiedFilenames.forEach((filename, index) => {
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
       /**
-       * Read the modified file contents and resolve the relevant prettier config
+       * Read the modified file contents and resolve the relevant formatter.
        */
-      const modifiedFile = new ModifiedFile(
-        join(workingDirectory, filename),
+      const modifiedFile = new ModifiedFile({
+        fullPath: join(workingDirectory, filename),
         sha1,
         sha2,
-      );
+        preciseFormatter: preciseFormatterPrettier,
+      });
       /**
        * To avoid unnecessary issues with 100% valid files producing issues when parts
        * of them are reformatted in isolation, we first check the whole file to see if

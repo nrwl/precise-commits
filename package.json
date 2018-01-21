@@ -8,6 +8,7 @@
     "bin",
     "lib"
   ],
+  "bin": "bin/prettier-lines.js",
   "repository": "JamesHenry/prettier-lines",
   "license": "MIT",
   "scripts": {

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`prettier resolvePrettierConfigForFile() brand-new-jsx-file 1`] = `
+exports[`preciseFormatterPrettier resolveConfig() brand-new-jsx-file 1`] = `
 Object {
   "semi": true,
   "singleQuote": true,
@@ -8,7 +8,7 @@ Object {
 }
 `;
 
-exports[`prettier resolvePrettierConfigForFile() empty-javascript-file 1`] = `
+exports[`preciseFormatterPrettier resolveConfig() empty-javascript-file 1`] = `
 Object {
   "semi": true,
   "singleQuote": true,
@@ -16,7 +16,7 @@ Object {
 }
 `;
 
-exports[`prettier resolvePrettierConfigForFile() formatting-would-affect-total-line-count 1`] = `
+exports[`preciseFormatterPrettier resolveConfig() formatting-would-affect-total-line-count 1`] = `
 Object {
   "semi": true,
   "singleQuote": true,
@@ -24,7 +24,7 @@ Object {
 }
 `;
 
-exports[`prettier resolvePrettierConfigForFile() multiple-updated-lines-javascript-file 1`] = `
+exports[`preciseFormatterPrettier resolveConfig() multiple-updated-lines-javascript-file 1`] = `
 Object {
   "semi": true,
   "singleQuote": false,
@@ -32,7 +32,7 @@ Object {
 }
 `;
 
-exports[`prettier resolvePrettierConfigForFile() single-updated-line-typescript 1`] = `
+exports[`preciseFormatterPrettier resolveConfig() single-updated-line-typescript 1`] = `
 Object {
   "semi": true,
   "singleQuote": true,

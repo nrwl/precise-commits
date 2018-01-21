@@ -30,7 +30,7 @@ if (config.whitelist) {
     console.error(
       `Error: No files match the glob pattern(s) you provided for --whitelist -> "${
         config.pattern
-      }"`,
+      }"`
     );
     return process.exit(1);
   }
@@ -42,7 +42,7 @@ if (config.whitelist) {
 if (config.sha1 || config.sha2) {
   if (!(config.sha1 && config.sha2)) {
     console.error(
-      `Error: When filtering between commit SHAs you must provide both --sha1 and --sha2`,
+      `Error: When filtering between commit SHAs you must provide both --sha1 and --sha2`
     );
     return process.exit(1);
   }
@@ -71,7 +71,7 @@ prettierLines(process.cwd(), options, {
       return;
     }
     modifiedFilesSpinner.succeed(
-      ` ${modifiedFilenames.length} modified file(s) found`,
+      ` ${modifiedFilenames.length} modified file(s) found`
     );
   },
   onBegunProcessingFile(filename, index, totalFiles) {
@@ -87,7 +87,7 @@ prettierLines(process.cwd(), options, {
         break;
       case 'NOT_UPDATED':
         spinner.info(
-          `       --> No formatting changes required in: ${filename}`,
+          `       --> No formatting changes required in: ${filename}`
         );
         break;
       case 'INVALID_FORMATTING':
