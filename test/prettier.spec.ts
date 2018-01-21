@@ -3,6 +3,7 @@ import {
   resolvePrettierConfigForFile,
   formatRangesWithinContents,
   checkRangesWithinContents,
+  patchContentsWithFormattedRanges,
 } from '../src/prettier';
 
 const fixtures = readFixtures();
@@ -29,7 +30,7 @@ describe('prettier', () => {
         var c = 3
       `;
       const formatted = formatRangesWithinContents(
-        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 46, rangeEnd: 62 }],
+        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 44, rangeEnd: 60 }],
         contents,
         {
           semi: true,
@@ -41,39 +42,61 @@ describe('prettier', () => {
         var c = 3;
       `);
     });
+  });
 
-    describe('checkRangesWithinContents()', () => {
-      it('should return true if the given ranges are all formatted according to the given config', () => {
-        const contents = `
-          var a = 1;
-          var b = 2
-          var c = 3;
-        `;
-        const formatted = checkRangesWithinContents(
-          [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 46, rangeEnd: 62 }],
-          contents,
-          {
-            semi: true,
-          },
-        );
-        expect(formatted).toEqual(true);
-      });
+  describe('patchContentsWithFormattedRanges()', () => {
+    it('should format the given ranges of the given source', () => {
+      const contents = `
+        var a = 1
+        var b = 2
+        var c = 3
+      `;
+      const formatted = patchContentsWithFormattedRanges(
+        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 44, rangeEnd: 60 }],
+        contents,
+        {
+          semi: true,
+        },
+      );
+      expect(formatted).toEqual(`
+        var a = 1;
+        var b = 2
+        var c = 3;
+      `);
+    });
+  });
 
-      it('should return false if any of the given ranges are not formatted according to the given config', () => {
-        const contents = `
-          var a = 1
-          var b = 2
-          var c = 3
-        `;
-        const formatted = checkRangesWithinContents(
-          [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 46, rangeEnd: 62 }],
-          contents,
-          {
-            semi: true,
-          },
-        );
-        expect(formatted).toEqual(false);
-      });
+  describe('checkRangesWithinContents()', () => {
+    it('should return true if the given ranges are all formatted according to the given config', () => {
+      const contents = `
+        var a = 1;
+        var b = 2
+        var c = 3;
+      `;
+      const formatted = checkRangesWithinContents(
+        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 46, rangeEnd: 62 }],
+        contents,
+        {
+          semi: true,
+        },
+      );
+      expect(formatted).toEqual(true);
+    });
+
+    it('should return false if any of the given ranges are not formatted according to the given config', () => {
+      const contents = `
+        var a = 1
+        var b = 2
+        var c = 3
+      `;
+      const formatted = checkRangesWithinContents(
+        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 46, rangeEnd: 62 }],
+        contents,
+        {
+          semi: true,
+        },
+      );
+      expect(formatted).toEqual(false);
     });
   });
 });

@@ -9,6 +9,9 @@ import {
 } from 'prettier';
 
 const ignore = require('ignore');
+// const diff = require('diff');
+const DiffMatchPatch = require('diff-match-patch');
+const dmp = new DiffMatchPatch();
 
 /**
  * Resolve the user's prettier config
@@ -36,6 +39,29 @@ export function formatRangesWithinContents(
       },
     });
   });
+  return formattedContents;
+}
+
+export function patchContentsWithFormattedRanges(
+  characterRanges: any[],
+  fileContents: string,
+  prettierConfig: Options | null,
+): string {
+  let patches: any = [];
+  characterRanges.forEach(characterRange => {
+    const diffs = dmp.diff_main(
+      fileContents,
+      format(fileContents, {
+        ...prettierConfig,
+        ...{
+          rangeStart: characterRange.rangeStart,
+          rangeEnd: characterRange.rangeEnd,
+        },
+      }),
+    );
+    patches = [...patches, ...dmp.patch_make(fileContents, diffs)];
+  });
+  const [formattedContents] = dmp.patch_apply(patches, fileContents);
   return formattedContents;
 }
 
