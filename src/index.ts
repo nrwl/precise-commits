@@ -67,16 +67,19 @@ export function main(
       sha1,
       sha2,
     );
-    callbacks.onModifiedFilesDetected(modifiedFilenames);
     const totalFiles = modifiedFilenames.length;
+    callbacks.onModifiedFilesDetected(modifiedFilenames);
 
     modifiedFilenames.forEach((filename, index) => {
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
-      const fullPath = join(workingDirectory, filename);
       /**
        * Read the modified file contents and resolve the relevant prettier config
        */
-      const modifiedFile = new ModifiedFile(fullPath, sha1, sha2);
+      const modifiedFile = new ModifiedFile(
+        join(workingDirectory, filename),
+        sha1,
+        sha2,
+      );
       /**
        * To avoid unnecessary issues with 100% valid files producing issues when parts
        * of them are reformatted in isolation, we first check the whole file to see if
@@ -104,6 +107,9 @@ export function main(
             'NOT_UPDATED',
           );
         }
+        /**
+         * Unexpected error, bubble up to the main onError handler
+         */
         throw err;
       }
       /**
