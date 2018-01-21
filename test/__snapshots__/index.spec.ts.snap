@@ -44,6 +44,17 @@ var audience = 'world';
 "
 `;
 
+exports[`prettier-lines main() formatting-would-affect-total-line-count 1`] = `
+"  var untouchedUglyLine     =      10
+
+function myfunc(a, b, c) {
+  console.log('blah');
+}
+
+var newStatement = true;
+"
+`;
+
 exports[`prettier-lines main() multiple-updated-lines-javascript-file 1`] = `
 "var     untouchedUglyLines1 = ''
 function TouchedFunctionSignature({
@@ -51,7 +62,7 @@ function TouchedFunctionSignature({
   greeted = '\\"Mars\\"',
   silent = false
 }) {}
-const newlyAddedUglyLine = true;"
+      const newlyAddedUglyLine = true;"
 `;
 
 exports[`prettier-lines main() single-updated-line-typescript 1`] = `

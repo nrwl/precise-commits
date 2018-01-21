@@ -9,7 +9,6 @@ import {
 } from 'prettier';
 
 const ignore = require('ignore');
-// const diff = require('diff');
 const DiffMatchPatch = require('diff-match-patch');
 const dmp = new DiffMatchPatch();
 
@@ -20,29 +19,13 @@ export function resolvePrettierConfigForFile(filename: string): Options | null {
   return resolveConfig.sync(filename, { useCache: false });
 }
 
+
 /**
- * Format the given content by running prettier on the specific range data given.
- * This may require running prettier on the file multiple times for multiple ranges.
+ * Run prettier on each character range pair given, and apply the
+ * difference as a patch to the original contents using an implementation
+ * of the Myer's diff algorithm.
  */
 export function formatRangesWithinContents(
-  characterRanges: any[],
-  fileContents: string,
-  prettierConfig: Options | null,
-): string {
-  let formattedContents = fileContents;
-  characterRanges.forEach(characterRange => {
-    formattedContents = format(formattedContents, {
-      ...prettierConfig,
-      ...{
-        rangeStart: characterRange.rangeStart,
-        rangeEnd: characterRange.rangeEnd,
-      },
-    });
-  });
-  return formattedContents;
-}
-
-export function patchContentsWithFormattedRanges(
   characterRanges: any[],
   fileContents: string,
   prettierConfig: Options | null,

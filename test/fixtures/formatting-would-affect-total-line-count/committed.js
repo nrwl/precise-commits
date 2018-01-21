@@ -1,6 +1,9 @@
-function myfunc2(
+  var untouchedUglyLine     =      10
+
+function myfunc(
     a,
-    b
+    b,
+    c
 ) {
     console.log('blah')
 }

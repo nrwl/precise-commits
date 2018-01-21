@@ -21,12 +21,12 @@ Array [
 exports[`utils calculateCharacterRangesFromLineChanges() formatting-would-affect-total-line-count 1`] = `
 Array [
   Object {
-    "rangeEnd": 17,
-    "rangeStart": 0,
+    "rangeEnd": 75,
+    "rangeStart": 62,
   },
   Object {
-    "rangeEnd": 85,
-    "rangeStart": 60,
+    "rangeEnd": 130,
+    "rangeStart": 105,
   },
 ]
 `;
@@ -81,18 +81,18 @@ exports[`utils extractLineChangeData() formatting-would-affect-total-line-count 
 Object {
   "additions": Array [
     Object {
-      "noOfLines": 1,
-      "start": 1,
+      "noOfLines": 2,
+      "start": 5,
     },
     Object {
       "noOfLines": 2,
-      "start": 7,
+      "start": 10,
     },
   ],
   "removals": Array [
     Object {
       "noOfLines": 1,
-      "start": 1,
+      "start": 5,
     },
   ],
 }

@@ -45,13 +45,14 @@ index 0000000..3772dd0
 
 exports[`git-utils getDiffForFile() formatting-would-affect-total-line-count 1`] = `
 "diff --git a/formatting-would-affect-total-line-count.js b/formatting-would-affect-total-line-count.js
-index 3bcce23..637d3a4 100644
+index 4e74cec..5eda403 100644
 --- a/formatting-would-affect-total-line-count.js
 +++ b/formatting-would-affect-total-line-count.js
-@@ -1 +1 @@
--function myfunc(
-+function myfunc2(
-@@ -6,0 +7,2 @@ function myfunc(
+@@ -5 +5,2 @@ function myfunc(
+-    b
++    b,
++    c
+@@ -8,0 +10,2 @@ function myfunc(
 +
 +var newStatement = true"
 `;

@@ -3,7 +3,6 @@ import {
   resolvePrettierConfigForFile,
   formatRangesWithinContents,
   checkRangesWithinContents,
-  patchContentsWithFormattedRanges,
 } from '../src/prettier';
 
 const fixtures = readFixtures();
@@ -30,28 +29,6 @@ describe('prettier', () => {
         var c = 3
       `;
       const formatted = formatRangesWithinContents(
-        [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 44, rangeEnd: 60 }],
-        contents,
-        {
-          semi: true,
-        },
-      );
-      expect(formatted).toEqual(`
-        var a = 1;
-        var b = 2
-        var c = 3;
-      `);
-    });
-  });
-
-  describe('patchContentsWithFormattedRanges()', () => {
-    it('should format the given ranges of the given source', () => {
-      const contents = `
-        var a = 1
-        var b = 2
-        var c = 3
-      `;
-      const formatted = patchContentsWithFormattedRanges(
         [{ rangeStart: 0, rangeEnd: 10 }, { rangeStart: 44, rangeEnd: 60 }],
         contents,
         {
