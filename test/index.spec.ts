@@ -14,16 +14,28 @@ describe('prettier-lines', () => {
     });
 
     fixtures.forEach(fixture => {
-      it(fixture.fixtureName, () => {
+      it(fixture.fixtureName, (done) => {
+        expect.assertions(1);
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         const options = mergeOptionsForTmpFile(
           { checkOnly: false, filesWhitelist: null },
           tmpFile,
         );
-        main(tmpFile.directoryPath, options);
-        const formatted = readFileSync(tmpFile.path, 'utf8');
-        expect(formatted).toMatchSnapshot();
+        main(tmpFile.directoryPath, options, {
+          onInit() {},
+          onBegunProcessingFile() {},
+          onModifiedFilesDetected() {},
+          onFinishedProcessingFile() {},
+          onComplete() {
+            const formatted = readFileSync(tmpFile.path, 'utf8');
+            expect(formatted).toMatchSnapshot();
+            done();
+          },
+          onError(err) {
+            done.fail(err);
+          },
+        });
       });
     });
   });

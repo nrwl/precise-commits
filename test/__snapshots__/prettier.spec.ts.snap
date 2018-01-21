@@ -16,7 +16,7 @@ Object {
 }
 `;
 
-exports[`prettier resolvePrettierConfigForFile() multi-range-regression 1`] = `
+exports[`prettier resolvePrettierConfigForFile() formatting-would-affect-total-line-count 1`] = `
 Object {
   "semi": true,
   "singleQuote": true,

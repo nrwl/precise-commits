@@ -18,19 +18,15 @@ Array [
 ]
 `;
 
-exports[`utils calculateCharacterRangesFromLineChanges() multi-range-regression 1`] = `
+exports[`utils calculateCharacterRangesFromLineChanges() formatting-would-affect-total-line-count 1`] = `
 Array [
   Object {
-    "rangeEnd": 847,
-    "rangeStart": 811,
+    "rangeEnd": 17,
+    "rangeStart": 0,
   },
   Object {
-    "rangeEnd": 914,
-    "rangeStart": 878,
-  },
-  Object {
-    "rangeEnd": 2928,
-    "rangeStart": 2171,
+    "rangeEnd": 85,
+    "rangeStart": 60,
   },
 ]
 `;
@@ -81,30 +77,22 @@ Object {
 }
 `;
 
-exports[`utils extractLineChangeData() multi-range-regression 1`] = `
+exports[`utils extractLineChangeData() formatting-would-affect-total-line-count 1`] = `
 Object {
   "additions": Array [
     Object {
       "noOfLines": 1,
-      "start": 32,
+      "start": 1,
     },
     Object {
-      "noOfLines": 1,
-      "start": 35,
-    },
-    Object {
-      "noOfLines": 33,
-      "start": 82,
+      "noOfLines": 2,
+      "start": 7,
     },
   ],
   "removals": Array [
     Object {
       "noOfLines": 1,
-      "start": 32,
-    },
-    Object {
-      "noOfLines": 1,
-      "start": 35,
+      "start": 1,
     },
   ],
 }
