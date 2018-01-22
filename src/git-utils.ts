@@ -53,15 +53,10 @@ const DIFF_INDEX_FILTER = 'ACDMRTUXB';
 const SPECIAL_EMPTY_TREE_COMMIT_HASH =
   '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
-export function getRelevantModifiedFiles(
+export function getModifiedFilenames(
   workingDirectory: string,
-  filesWhitelist: string[] | null,
   sha1: string | null,
   sha2: string | null,
-  hasSupportedFileExtension: (filename: string) => boolean,
-  generateIgnoreFilePredicate: (
-    workingDirectory: string,
-  ) => (filename: string) => boolean,
 ): string[] {
   /**
    * Resolve the relevant .git directory
@@ -124,25 +119,7 @@ export function getRelevantModifiedFiles(
     ).stdout;
   }
   const allFiles = parseDiffIndexOutput(diffIndexOutput);
-  /**
-   * We fundamentally check whether or not the file extensions are supported by the given formatter,
-   * whether or not they are included in the optional `filesWhitelist` array, and that the user
-   * has not chosen to ignore them via any supported "ignore" mechanism of the formatter.
-   */
-  return allFiles
-    .map(r => r.filename)
-    .filter(hasSupportedFileExtension)
-    .filter(generateFilesWhitelistPredicate(filesWhitelist))
-    .filter(generateIgnoreFilePredicate(workingDirectory));
-}
-
-function generateFilesWhitelistPredicate(
-  filesWhitelist: string[] | null,
-): (file: string) => boolean {
-  if (!filesWhitelist) {
-    return () => true;
-  }
-  return file => filesWhitelist.includes(file);
+  return allFiles.map(r => r.filename);
 }
 
 function parseDiffIndexOutput(stdout: string): DiffIndexFile[] {

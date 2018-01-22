@@ -1,7 +1,10 @@
 import { join } from 'path';
 
-import { getRelevantModifiedFiles } from './git-utils';
-import { NO_LINE_CHANGE_DATA_ERROR } from './utils';
+import { getModifiedFilenames } from './git-utils';
+import {
+  NO_LINE_CHANGE_DATA_ERROR,
+  generateFilesWhitelistPredicate,
+} from './utils';
 import { ModifiedFile } from './modified-file';
 import { preciseFormatterPrettier } from './precise-formatters/prettier';
 
@@ -31,21 +34,12 @@ export interface Callbacks {
   onComplete(totalFiles: number): void;
 }
 
-function applyDefaults(options: AdditionalOptions): AdditionalOptions {
-  options = options || {};
-  options.filesWhitelist = options.filesWhitelist || null;
-  options.sha1 = options.sha1 || null;
-  options.sha2 = options.sha2 || null;
-  options.checkOnly = !!options.checkOnly;
-  return options;
-}
-
 /**
- * prettier-lines library
+ * LIBRARY
  */
 export function main(
   workingDirectory: string,
-  options: AdditionalOptions,
+  additionalOptions: AdditionalOptions,
   callbacks: Callbacks = {
     onInit() {},
     onModifiedFilesDetected() {},
@@ -56,23 +50,39 @@ export function main(
   },
 ) {
   /**
-   * Apply default options
+   * Merge user-given and default options.
    */
-  const { checkOnly, filesWhitelist, sha1, sha2 } = applyDefaults(options);
+  const options = {
+    ...{ filesWhitelist: null, sha1: null, sha2: null, checkOnly: false },
+    ...additionalOptions,
+  };
+  /**
+   * Note: Will be exposed as an option if/when new formatters are added.
+   */
+  const preciseFormatter = preciseFormatterPrettier;
   try {
     callbacks.onInit(workingDirectory);
-
-    const modifiedFilenames = getRelevantModifiedFiles(
+    /**
+     * We fundamentally check whether or not the file extensions are supported by the given formatter,
+     * whether or not they are included in the optional `filesWhitelist` array, and that the user
+     * has not chosen to ignore them via any supported "ignore" mechanism of the formatter.
+     */
+    const modifiedFilenames = getModifiedFilenames(
       workingDirectory,
-      filesWhitelist,
-      sha1,
-      sha2,
-      preciseFormatterPrettier.hasSupportedFileExtension,
-      preciseFormatterPrettier.generateIgnoreFilePredicate,
-    );
+      options.sha1,
+      options.sha2,
+    )
+      .filter(preciseFormatter.hasSupportedFileExtension)
+      .filter(generateFilesWhitelistPredicate(options.filesWhitelist))
+      .filter(preciseFormatter.generateIgnoreFilePredicate(workingDirectory));
+    /**
+     * Report on the the total number of relevant files.
+     */
     const totalFiles = modifiedFilenames.length;
     callbacks.onModifiedFilesDetected(modifiedFilenames);
-
+    /**
+     * Process each file synchronously.
+     */
     modifiedFilenames.forEach((filename, index) => {
       callbacks.onBegunProcessingFile(filename, index, totalFiles);
       /**
@@ -80,14 +90,14 @@ export function main(
        */
       const modifiedFile = new ModifiedFile({
         fullPath: join(workingDirectory, filename),
-        sha1,
-        sha2,
-        preciseFormatter: preciseFormatterPrettier,
+        sha1: options.sha1,
+        sha2: options.sha2,
+        preciseFormatter,
       });
       /**
        * To avoid unnecessary issues with 100% valid files producing issues when parts
        * of them are reformatted in isolation, we first check the whole file to see if
-       * it is already formatted. This also allows us to skip unnecessary git diff
+       * it is already formatted. This could also allow us to skip unnecessary git diff
        * analysis work.
        */
       if (modifiedFile.isAlreadyFormatted()) {
@@ -117,9 +127,9 @@ export function main(
         throw err;
       }
       /**
-       * CHECK ONLY
+       * "CHECK ONLY MODE"
        */
-      if (checkOnly) {
+      if (options.checkOnly) {
         if (!modifiedFile.hasValidFormattingForCharacterRanges()) {
           return callbacks.onFinishedProcessingFile(
             filename,
@@ -135,7 +145,7 @@ export function main(
         }
       }
       /**
-       * FORMAT
+       * "FORMAT MODE"
        */
       modifiedFile.formatCharacterRangesWithinContents();
       if (!modifiedFile.shouldContentsBeUpdatedOnDisk()) {
@@ -146,14 +156,19 @@ export function main(
         );
       }
       /**
-       * Write the file back to disk
+       * Write the file back to disk and report.
        */
       modifiedFile.updateFileOnDisk();
       return callbacks.onFinishedProcessingFile(filename, index, 'UPDATED');
     });
-
+    /**
+     * Report that all files have finished processing.
+     */
     callbacks.onComplete(totalFiles);
   } catch (err) {
+    /**
+     * Report and unhandled errors.
+     */
     callbacks.onError(err);
   }
 }
