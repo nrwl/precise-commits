@@ -3,7 +3,7 @@ import { join } from 'path';
 import { TestBed, readFixtures } from './test-utils';
 import {
   getDiffForFile,
-  resolveNearestGitDirectory,
+  resolveNearestGitDirectoryParent,
   getModifiedFilenames,
 } from '../src/git-utils';
 import { preciseFormatterPrettier } from '../src/precise-formatters/prettier';
@@ -12,7 +12,7 @@ const fixtures = readFixtures();
 let testBed: TestBed;
 
 describe('git-utils', () => {
-  describe('resolveNearestGitDirectory()', () => {
+  describe('resolveNearestGitDirectoryParent()', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
@@ -24,15 +24,15 @@ describe('git-utils', () => {
         /**
          * The tmpFile should resolve to its own .git directory
          */
-        expect(resolveNearestGitDirectory(tmpFile.directoryPath)).toEqual(
-          join(tmpFile.directoryPath, '.git'),
+        expect(resolveNearestGitDirectoryParent(tmpFile.directoryPath)).toEqual(
+          tmpFile.directoryPath,
         );
       });
     });
 
     it(`should resolve the overall project's .git directory for this spec file`, () => {
-      expect(resolveNearestGitDirectory(__dirname)).toEqual(
-        join(__dirname, '../.git'),
+      expect(resolveNearestGitDirectoryParent(__dirname)).toEqual(
+        join(__dirname, '..'),
       );
     });
   });
@@ -47,6 +47,7 @@ describe('git-utils', () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         const diff = getDiffForFile(
+          resolveNearestGitDirectoryParent(tmpFile.directoryPath),
           tmpFile.path,
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,
@@ -66,7 +67,7 @@ describe('git-utils', () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         const fileNames = getModifiedFilenames(
-          tmpFile.directoryPath,
+          resolveNearestGitDirectoryParent(tmpFile.directoryPath),
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,
         );

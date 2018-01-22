@@ -1,5 +1,8 @@
 import { TestBed, readFixtures } from './test-utils';
-import { getDiffForFile } from '../src/git-utils';
+import {
+  getDiffForFile,
+  resolveNearestGitDirectoryParent,
+} from '../src/git-utils';
 import {
   extractLineChangeData,
   calculateCharacterRangesFromLineChanges,
@@ -19,6 +22,7 @@ describe('utils', () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         const diff = getDiffForFile(
+          resolveNearestGitDirectoryParent(tmpFile.directoryPath),
           tmpFile.path,
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,
@@ -39,6 +43,7 @@ describe('utils', () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
         const diff = getDiffForFile(
+          resolveNearestGitDirectoryParent(tmpFile.directoryPath),
           tmpFile.path,
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,

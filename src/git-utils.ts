@@ -8,26 +8,31 @@ interface DiffIndexFile {
   filename: string;
 }
 
-export function resolveNearestGitDirectory(workingDirectory: string) {
-  return findUpSync('.git', { cwd: workingDirectory });
+export function resolveNearestGitDirectoryParent(workingDirectory: string) {
+  const gitDirectoryPath = findUpSync('.git', { cwd: workingDirectory });
+  if (!gitDirectoryPath) {
+    throw new Error('No .git directory found');
+  }
+  return dirname(gitDirectoryPath);
 }
 
 export function getDiffForFile(
-  filename: string,
+  gitDirectoryParent: string,
+  fullPath: string,
   sha1: string | null,
   sha2: string | null,
 ): string {
   if (sha1 && sha2) {
     return runCommandSync(
       'git',
-      ['diff', '--unified=0', sha1, sha2, filename],
-      dirname(filename),
+      ['diff', '--unified=0', sha1, sha2, fullPath],
+      gitDirectoryParent,
     ).stdout;
   }
   return runCommandSync(
     'git',
-    ['diff', '--unified=0', '--cached', filename],
-    dirname(filename),
+    ['diff', '--unified=0', '--cached', fullPath],
+    gitDirectoryParent,
   ).stdout;
 }
 
@@ -54,18 +59,10 @@ const SPECIAL_EMPTY_TREE_COMMIT_HASH =
   '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
 export function getModifiedFilenames(
-  workingDirectory: string,
+  gitDirectoryParent: string,
   sha1: string | null,
   sha2: string | null,
 ): string[] {
-  /**
-   * Resolve the relevant .git directory
-   */
-  const gitDirectoryPath = resolveNearestGitDirectory(workingDirectory);
-  if (!gitDirectoryPath) {
-    throw new Error('No .git directory found');
-  }
-  const gitDirectoryParent = dirname(gitDirectoryPath);
   let diffIndexOutput: string;
   if (sha1 && sha2) {
     /**

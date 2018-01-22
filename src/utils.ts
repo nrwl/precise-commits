@@ -57,6 +57,10 @@ export function extractLineChangeData(diffData: string) {
   return lineChangeData;
 }
 
+function getTextBeforeLineIndex(linesInFile: string[], index: number): string {
+  return linesInFile.slice(0, index).join('\n');
+}
+
 export function calculateCharacterRangesFromLineChanges(
   lineChangeData: LineChangeData,
   fileContents: string,
@@ -97,6 +101,11 @@ export function runCommandSync(
   return execa.sync(command, args, { cwd: workingDirectory });
 }
 
-function getTextBeforeLineIndex(linesInFile: string[], index: number): string {
-  return linesInFile.slice(0, index).join('\n');
+export function generateFilesWhitelistPredicate(
+  filesWhitelist: string[] | null,
+): (file: string) => boolean {
+  if (!filesWhitelist) {
+    return () => true;
+  }
+  return file => filesWhitelist.includes(file);
 }

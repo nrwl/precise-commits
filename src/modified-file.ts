@@ -10,6 +10,7 @@ import { PreciseFormatter } from './precise-formatter';
 
 export interface ModifiedFileConfig {
   fullPath: string;
+  gitDirectoryParent: string;
   sha1: string | null;
   sha2: string | null;
   preciseFormatter: PreciseFormatter<any>;
@@ -17,9 +18,21 @@ export interface ModifiedFileConfig {
 
 export class ModifiedFile {
   private fullPath: string;
+  /**
+   * An optional commit SHA pair which will be used to inform how the git
+   * commands are run. E.g. `git diff`
+   */
   private sha1: string | null;
   private sha2: string | null;
+  /**
+   * The chosen formatter to be run on the modified file.
+   */
   private preciseFormatter: PreciseFormatter<any>;
+  /**
+   * The parent directory of the relevant .git directory that was resolved
+   * for the modified file.
+   */
+  private gitDirectoryParent: string;
   /**
    * The contents of the file in their current state on the user's file
    * system
@@ -39,8 +52,15 @@ export class ModifiedFile {
    */
   private modifiedCharacterRanges: CharacterRange[] = [];
 
-  constructor({ fullPath, sha1, sha2, preciseFormatter }: ModifiedFileConfig) {
+  constructor({
+    fullPath,
+    gitDirectoryParent,
+    sha1,
+    sha2,
+    preciseFormatter,
+  }: ModifiedFileConfig) {
     this.fullPath = fullPath;
+    this.gitDirectoryParent = gitDirectoryParent;
     this.sha1 = sha1;
     this.sha2 = sha2;
     this.preciseFormatter = preciseFormatter;
@@ -107,7 +127,12 @@ export class ModifiedFile {
       /**
        * Extract line change data from the git diff results.
        */
-      const diff = getDiffForFile(this.fullPath, this.sha1, this.sha2);
+      const diff = getDiffForFile(
+        this.gitDirectoryParent,
+        this.fullPath,
+        this.sha1,
+        this.sha2,
+      );
       const lineChangeData = extractLineChangeData(diff);
       /**
        * Convert the line change data into character data.

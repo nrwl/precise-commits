@@ -1,6 +1,9 @@
 import { join } from 'path';
 
-import { getModifiedFilenames } from './git-utils';
+import {
+  getModifiedFilenames,
+  resolveNearestGitDirectoryParent,
+} from './git-utils';
 import {
   NO_LINE_CHANGE_DATA_ERROR,
   generateFilesWhitelistPredicate,
@@ -63,12 +66,19 @@ export function main(
   try {
     callbacks.onInit(workingDirectory);
     /**
+     * Resolve the relevant .git directory's parent directory up front, as we will need this when
+     * executing various `git` commands.
+     */
+    const gitDirectoryParent = resolveNearestGitDirectoryParent(
+      workingDirectory,
+    );
+    /**
      * We fundamentally check whether or not the file extensions are supported by the given formatter,
      * whether or not they are included in the optional `filesWhitelist` array, and that the user
      * has not chosen to ignore them via any supported "ignore" mechanism of the formatter.
      */
     const modifiedFilenames = getModifiedFilenames(
-      workingDirectory,
+      gitDirectoryParent,
       options.sha1,
       options.sha2,
     )
@@ -90,6 +100,7 @@ export function main(
        */
       const modifiedFile = new ModifiedFile({
         fullPath: join(workingDirectory, filename),
+        gitDirectoryParent,
         sha1: options.sha1,
         sha2: options.sha2,
         preciseFormatter,
