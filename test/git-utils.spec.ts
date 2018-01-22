@@ -4,7 +4,7 @@ import { TestBed, readFixtures } from './test-utils';
 import {
   getDiffForFile,
   resolveNearestGitDirectory,
-  getRelevantModifiedFiles,
+  getModifiedFilenames,
 } from '../src/git-utils';
 import { preciseFormatterPrettier } from '../src/precise-formatters/prettier';
 
@@ -56,7 +56,7 @@ describe('git-utils', () => {
     });
   });
 
-  describe('getRelevantModifiedFiles()', () => {
+  describe('getModifiedFilenames()', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
@@ -65,13 +65,10 @@ describe('git-utils', () => {
       it(fixture.fixtureName, () => {
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);
-        const fileNames = getRelevantModifiedFiles(
+        const fileNames = getModifiedFilenames(
           tmpFile.directoryPath,
-          null,
           tmpFile.initialCommitSHA,
           tmpFile.updatedCommitSHA,
-          preciseFormatterPrettier.hasSupportedFileExtension,
-          preciseFormatterPrettier.generateIgnoreFilePredicate,
         );
         expect(fileNames).toEqual([`${tmpFile.filename}`]);
       });
