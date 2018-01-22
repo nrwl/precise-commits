@@ -4,7 +4,7 @@
   "trailingComma": "all",
   "overrides": [
     {
-      "files": "bin/prettier-lines.js",
+      "files": "bin/*.js",
       "options": {
         "trailingComma": "es5"
       }

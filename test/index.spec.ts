@@ -4,17 +4,18 @@ import { TestBed, readFixtures, mergeOptionsForTmpFile } from './test-utils';
 
 import { main } from '../src/index';
 
+const LIBRARY_NAME = require('../package.json').name;
 const fixtures = readFixtures();
 let testBed: TestBed;
 
-describe('prettier-lines', () => {
+describe(LIBRARY_NAME, () => {
   describe('main()', () => {
     beforeAll(() => {
       testBed = new TestBed();
     });
 
     fixtures.forEach(fixture => {
-      it(fixture.fixtureName, (done) => {
+      it(fixture.fixtureName, done => {
         expect.assertions(1);
         testBed.prepareFixtureInTmpDirectory(fixture);
         const tmpFile = testBed.getTmpFileForFixture(fixture);

@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * prettier-lines CLI output
+ * CLI output
  */
 const ora = require('ora');
 const mri = require('mri');
@@ -11,6 +11,8 @@ const glob = require('glob');
 
 const prettierLines = require('../lib').main;
 const config = mri(process.argv.slice(2));
+
+const LIBRARY_NAME = require('../package.json').name;
 
 /**
  * If the user provided one or more glob patterns to match against, ensure that there are
@@ -55,7 +57,7 @@ const options = {
   sha2: config.sha2 || null,
 };
 
-const primarySpinner = ora(' Running prettier-lines...');
+const primarySpinner = ora(` Running ${LIBRARY_NAME}...`);
 const modifiedFilesSpinner = ora(' Detecting modified files from git...');
 const spinnersByFilename = {};
 
@@ -103,7 +105,7 @@ prettierLines(process.cwd(), options, {
     }
   },
   onError(err) {
-    modifiedFilesSpinner.fail(' prettier-lines: An Error occurred\n');
+    modifiedFilesSpinner.fail(` ${LIBRARY_NAME}: An Error occurred\n`);
     console.error(err);
     console.log('\n');
     primarySpinner.stop();
@@ -111,7 +113,7 @@ prettierLines(process.cwd(), options, {
   },
   onComplete(totalFiles) {
     if (!totalFiles) {
-      modifiedFilesSpinner.info(` prettier-lines: No matching modified files detected.
+      modifiedFilesSpinner.info(` ${LIBRARY_NAME}: No matching modified files detected.
         
   --> If you feel that one or more files should be showing up here, be sure to first check what file extensions prettier supports, and whether or not you have included those files in a .prettierignore file
 
