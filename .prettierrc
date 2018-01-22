@@ -8,6 +8,12 @@
       "options": {
         "trailingComma": "es5"
       }
+    },
+    {
+      "files": "*.ts",
+      "options": {
+        "parser": "typescript"
+      }
     }
   ]
 }

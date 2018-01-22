@@ -34,6 +34,7 @@ Object {
 
 exports[`preciseFormatterPrettier resolveConfig() single-updated-line-typescript 1`] = `
 Object {
+  "parser": "typescript",
   "semi": true,
   "singleQuote": true,
   "trailingComma": "all",
