@@ -73,7 +73,7 @@ prettierLines(process.cwd(), options, {
       return;
     }
     modifiedFilesSpinner.succeed(
-      ` ${modifiedFilenames.length} modified file(s) found`
+      ` ${LIBRARY_NAME}: ${modifiedFilenames.length} modified file(s) found`
     );
   },
   onBegunProcessingFile(filename, index, totalFiles) {
