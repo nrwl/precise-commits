@@ -110,7 +110,7 @@ export function main(
        * Read the modified file contents and resolve the relevant formatter.
        */
       const modifiedFile = new ModifiedFile({
-        fullPath: join(workingDirectory, filename),
+        fullPath: join(gitDirectoryParent, filename),
         gitDirectoryParent,
         base: options.base,
         head: options.head,
