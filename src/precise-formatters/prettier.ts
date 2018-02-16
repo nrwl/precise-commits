@@ -29,9 +29,12 @@ export const preciseFormatterPrettier: PreciseFormatter<PrettierOptions> = {
    * modified file path.
    */
   resolveConfig(modifiedFilePath: string): PrettierOptions | null {
-    return resolveConfig.sync(modifiedFilePath, {
-      useCache: false,
-    });
+    return {
+      ...resolveConfig.sync(modifiedFilePath, {
+        useCache: false,
+      }),
+      filepath: modifiedFilePath,
+    };
   },
   /**
    * Return true if the whole file has already been formatted appropriately based on

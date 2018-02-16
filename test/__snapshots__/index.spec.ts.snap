@@ -1,5 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`precise-commits main() brand-new-json-file 1`] = `
+"{
+  \\"foo\\": true
+}
+"
+`;
+
 exports[`precise-commits main() brand-new-jsx-file 1`] = `
 "function HelloWorld({
   greeting = 'hello',
