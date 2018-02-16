@@ -1,5 +1,18 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`git-utils getDiffForFile() brand-new-json-file 1`] = `
+"diff --git a/brand-new-json-file.json b/brand-new-json-file.json
+new file mode 100644
+index 0000000..f663bcc
+--- /dev/null
++++ b/brand-new-json-file.json
+@@ -0,0 +1,3 @@
++{
++    \\"foo\\": true
++}
+\\\\ No newline at end of file"
+`;
+
 exports[`git-utils getDiffForFile() brand-new-jsx-file 1`] = `
 "diff --git a/brand-new-jsx-file.jsx b/brand-new-jsx-file.jsx
 new file mode 100644

@@ -1,5 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`utils calculateCharacterRangesFromLineChanges() brand-new-json-file 1`] = `
+Array [
+  Object {
+    "rangeEnd": 19,
+    "rangeStart": 0,
+  },
+]
+`;
+
 exports[`utils calculateCharacterRangesFromLineChanges() brand-new-jsx-file 1`] = `
 Array [
   Object {
@@ -51,6 +60,18 @@ Array [
     "rangeStart": 14,
   },
 ]
+`;
+
+exports[`utils extractLineChangeData() brand-new-json-file 1`] = `
+Object {
+  "additions": Array [
+    Object {
+      "noOfLines": 3,
+      "start": 1,
+    },
+  ],
+  "removals": Array [],
+}
 `;
 
 exports[`utils extractLineChangeData() brand-new-jsx-file 1`] = `
