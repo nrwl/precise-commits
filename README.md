@@ -1,8 +1,8 @@
 <h1 align="center">Precise Commits</h1>
 
 <p align="center">
-    <a href="https://travis-ci.org/JamesHenry/precise-commits"><img src="https://img.shields.io/travis/JamesHenry/precise-commits.svg?style=flat-square" alt="Travis"/></a>
-    <a href="https://github.com/JamesHenry/precise-commits/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/precise-commits.svg?style=flat-square" alt="GitHub license" /></a>
+    <a href="https://travis-ci.org/nrwl/precise-commits"><img src="https://img.shields.io/travis/nrwl/precise-commits.svg?style=flat-square" alt="Travis"/></a>
+    <a href="https://github.com/nrwl/precise-commits/blob/master/LICENSE"><img src="https://img.shields.io/npm/l/precise-commits.svg?style=flat-square" alt="GitHub license" /></a>
     <a href="https://www.npmjs.com/package/precise-commits"><img src="https://img.shields.io/npm/v/precise-commits.svg?style=flat-square" alt="NPM Version" /></a>
     <a href="https://www.npmjs.com/package/precise-commits"><img src="https://img.shields.io/npm/dt/precise-commits.svg?style=flat-square" alt="NPM Downloads" /></a>
     <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg" alt="Commitizen friendly" /></a>
@@ -182,7 +182,7 @@ As was hinted at above, the `precise-commits` CLI supports a few different confi
 
 * `--formatter`: **[String, Default: `"prettier"`]**
   * Currently only prettier is supported
-  * If you are interested in adding support for a different formatter, all you need to do is provide an object which [implements this interface](https://github.com/JamesHenry/precise-commits/blob/master/src/precise-formatter.ts).
+  * If you are interested in adding support for a different formatter, all you need to do is provide an object which [implements this interface](https://github.com/nrwl/precise-commits/blob/master/src/precise-formatter.ts).
 
 <br>
 
