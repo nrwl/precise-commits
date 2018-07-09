@@ -22,7 +22,7 @@ let filesWhitelist = null;
 if (config.whitelist) {
   filesWhitelist = [];
   if (Array.isArray(config.whitelist)) {
-    config.whitelist.forEach(pattern => {
+    config.whitelist.forEach(() => {
       filesWhitelist = [...filesWhitelist, ...glob.sync(config.whitelist)];
     });
   } else {
@@ -34,7 +34,7 @@ if (config.whitelist) {
         config.pattern
       }"`
     );
-    return process.exit(1);
+    process.exit(1);
   }
 }
 
@@ -47,7 +47,7 @@ if (config.base || config.head) {
     console.error(
       `Error: When giving a value of --head, you must also give a value for --base`
     );
-    return process.exit(1);
+    process.exit(1);
   }
   if (!config.head) {
     /**
@@ -65,14 +65,29 @@ const options = {
   formatter: config.formatter || 'prettier',
 };
 
+const jsonOutput = {
+  cliOutput: [],
+};
+
+if (config.json) {
+  jsonOutput.resolvedOptions = options;
+}
+
 const primarySpinner = ora(` Running ${LIBRARY_NAME}...`);
 const modifiedFilesSpinner = ora(' Detecting modified files from git...');
 const spinnersByFilename = {};
 
 let shouldErrorOut = false;
 
+function exit(exitCode = 0) {
+  if (config.json) {
+    console.log(JSON.stringify(jsonOutput, null, 3));
+  }
+  return process.exit(exitCode);
+}
+
 main(process.cwd(), options, {
-  onInit(workingDirectory) {
+  onInit() {
     primarySpinner.start();
     modifiedFilesSpinner.start();
   },
@@ -80,59 +95,106 @@ main(process.cwd(), options, {
     if (!modifiedFilenames || !modifiedFilenames.length) {
       return;
     }
-    modifiedFilesSpinner.succeed(
-      ` ${LIBRARY_NAME}: ${modifiedFilenames.length} modified file(s) found`
-    );
+    const output = ` ${LIBRARY_NAME}: ${
+      modifiedFilenames.length
+    } modified file(s) found`;
+    if (config.json) {
+      jsonOutput.cliOutput.push(output);
+      jsonOutput.modifiedFilenames = modifiedFilenames;
+    } else {
+      modifiedFilesSpinner.succeed(output);
+    }
   },
   onBegunProcessingFile(filename, index, totalFiles) {
-    spinnersByFilename[filename] = ora()
-      .start()
-      .succeed(` [${index + 1}/${totalFiles}] Processing file: ${filename}`);
+    const output = ` [${index + 1}/${totalFiles}] Processing file: ${filename}`;
+    if (config.json) {
+      jsonOutput.cliOutput.push(output);
+    } else {
+      spinnersByFilename[filename] = ora()
+        .start()
+        .succeed(output);
+    }
   },
   onFinishedProcessingFile(filename, index, status) {
     const spinner = spinnersByFilename[filename];
     switch (status) {
-      case 'UPDATED':
-        spinner.succeed(`       --> Updated formatting in: ${filename}`);
-        break;
-      case 'NOT_UPDATED':
-        spinner.info(
-          `       --> No formatting changes required in: ${filename}`
-        );
-        break;
-      case 'INVALID_FORMATTING':
+      case 'UPDATED': {
+        const output = `       --> Updated formatting in: ${filename}`;
+        if (config.json) {
+          jsonOutput.cliOutput.push(output);
+        } else {
+          spinner.succeed(output);
+        }
+        return;
+      }
+      case 'NOT_UPDATED': {
+        const output = `       --> No formatting changes required in: ${filename}`;
+        if (config.json) {
+          jsonOutput.cliOutput.push(output);
+        } else {
+          spinner.info(output);
+        }
+        return;
+      }
+      case 'INVALID_FORMATTING': {
         /**
          * If --check-only is passed as a CLI argument, the script will error out.
          */
         if (options.checkOnly) {
           shouldErrorOut = true;
         }
-        spinner.fail(`       --> Invalid formatting detected in: ${filename}`);
-        break;
+        const output = `       --> Invalid formatting detected in: ${filename}`;
+        if (config.json) {
+          jsonOutput.cliOutput.push(output);
+        } else {
+          spinner.fail(output);
+        }
+        return;
+      }
     }
   },
   onError(err) {
-    modifiedFilesSpinner.fail(` ${LIBRARY_NAME}: An Error occurred\n`);
+    const output = ` ${LIBRARY_NAME}: An Error occurred\n`;
+    if (config.json) {
+      jsonOutput.cliOutput.push(output);
+    } else {
+      modifiedFilesSpinner.fail(output);
+    }
     console.error(err);
     console.log('\n');
     primarySpinner.stop();
-    return process.exit(1);
+    return exit(1);
   },
   onComplete(totalFiles) {
     if (!totalFiles) {
-      modifiedFilesSpinner.info(` ${LIBRARY_NAME}: No matching modified files detected.
-        
+      const output = ` ${LIBRARY_NAME}: No matching modified files detected.
+    
   --> If you feel that one or more files should be showing up here, be sure to first check what file extensions prettier supports, and whether or not you have included those files in a .prettierignore file
 
-        `);
-      primarySpinner.stop();
-      return process.exit(shouldErrorOut ? 1 : 0);
+        `;
+      if (config.json) {
+        jsonOutput.cliOutput.push(output);
+      } else {
+        modifiedFilesSpinner.info(output);
+        primarySpinner.stop();
+      }
+      return exit(shouldErrorOut ? 1 : 0);
     }
     if (options.checkOnly) {
-      primarySpinner.succeed(' Checks complete 🎉');
+      const output = ' Checks complete 🎉';
+      if (config.json) {
+        jsonOutput.cliOutput.push(output);
+      } else {
+        primarySpinner.succeed(output);
+      }
     } else {
-      primarySpinner.succeed(' Formatting complete 🎉');
+      const output = ' Formatting complete 🎉';
+      if (config.json) {
+        jsonOutput.cliOutput.push(output);
+      } else {
+        primarySpinner.succeed(output);
+      }
     }
-    return process.exit(shouldErrorOut ? 1 : 0);
+    return exit(shouldErrorOut ? 1 : 0);
   },
 });

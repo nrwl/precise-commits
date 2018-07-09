@@ -37,15 +37,15 @@ export class ModifiedFile {
    * The contents of the file in their current state on the user's file
    * system
    */
-  public fileContents: string;
+  public fileContents: string | undefined;
   /**
    * The final file contents, after we've run the formatter
    */
-  private formattedFileContents: string;
+  private formattedFileContents: string | undefined;
   /**
    * The resolved formatter config which applies to this file
    */
-  private formatterConfig: object | null;
+  private formatterConfig: object | null = null;
   /**
    * The calculated character ranges which have been modified
    * within this file
@@ -74,7 +74,7 @@ export class ModifiedFile {
    */
   isAlreadyFormatted(): boolean {
     return this.selectedFormatter.isAlreadyFormatted(
-      this.fileContents,
+      this.fileContents!, // TODO: Remove need for non-null assertion operator
       this.formatterConfig,
     );
   }
@@ -85,7 +85,7 @@ export class ModifiedFile {
    */
   hasValidFormattingForCharacterRanges(): boolean {
     return this.selectedFormatter.checkFormattingOfRanges(
-      this.fileContents,
+      this.fileContents!, // TODO: Remove need for non-null assertion operator
       this.formatterConfig,
       this.modifiedCharacterRanges,
     );
@@ -96,7 +96,7 @@ export class ModifiedFile {
    */
   formatCharacterRangesWithinContents(): void {
     this.formattedFileContents = this.selectedFormatter.formatRanges(
-      this.fileContents,
+      this.fileContents!, // TODO: Remove need for non-null assertion operator
       this.formatterConfig,
       this.modifiedCharacterRanges,
     );
@@ -139,7 +139,7 @@ export class ModifiedFile {
        */
       this.modifiedCharacterRanges = calculateCharacterRangesFromLineChanges(
         lineChangeData,
-        this.fileContents,
+        this.fileContents!, // TODO: Remove need for non-null assertion operator
       );
       return { err: null };
     } catch (err) {

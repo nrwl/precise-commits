@@ -1,0 +1,10 @@
+diff --git a/test-source/foo.js b/test-source/foo.js
+index 1f5fc71..4a99d4b 100644
+--- a/test-source/foo.js
++++ b/test-source/foo.js
+@@ -1,2 +1,2 @@
+ const a = true
+-const b = true
+\ No newline at end of file
++const b = true;
+\ No newline at end of file

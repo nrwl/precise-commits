@@ -1,0 +1,18 @@
+{
+    "resolvedOptions": {
+        "base": null,
+        "head": null,
+        "checkOnly": false,
+        "filesWhitelist": null,
+        "formatter": "prettier"
+    },
+    "modifiedFilenames": [
+        "test-source/foo.js"
+    ],
+    "cliOutput": [
+        " precise-commits: 1 modified file(s) found",
+        " [1/1] Processing file: test-source/foo.js",
+        "       --> Updated formatting in: test-source/foo.js",
+        " Formatting complete 🎉"
+    ]
+}

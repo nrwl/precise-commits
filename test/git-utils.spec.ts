@@ -6,7 +6,6 @@ import {
   resolveNearestGitDirectoryParent,
   getModifiedFilenames,
 } from '../src/git-utils';
-import { preciseFormatterPrettier } from '../src/precise-formatters/prettier';
 
 const fixtures = readFixtures();
 let testBed: TestBed;

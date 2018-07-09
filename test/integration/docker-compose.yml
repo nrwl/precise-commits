@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  example:
+    build:
+      context: ./example
+      args:
+        CACHE_DATE: ${CACHE_DATE}
+    container_name: "example"
+    volumes:
+      # link to the integration test files, so that updates don't require a rebuild
+      - ./example:/usr/linked
+      # link to precise-commits source, but "ignore" test (by overriding it with an empty dir)
+      - ../../:/usr/precise-commits
+      - /usr/precise-commits/test

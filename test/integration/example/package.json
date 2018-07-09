@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "scripts": {
+        "start": "npm run precise-commits && npm run write-final-diff-to-file && npm run test",
+        "precise-commits": "/usr/precise-commits/bin/index.js --json > cli-output.json",
+        "test": "jest ./test.js",
+        "write-final-diff-to-file": "git diff > diff-output.txt"
+    },
+    "devDependencies": {
+        "jest": "23.3.0"
+    }
+}

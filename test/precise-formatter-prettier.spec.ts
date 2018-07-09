@@ -5,16 +5,14 @@ const fixtures = readFixtures();
 
 describe('preciseFormatterPrettier', () => {
   describe('resolveConfig()', () => {
-    fixtures.forEach(
-      ({ fixtureName, fileExtension, initialContents, stagedContents }) => {
-        it(fixtureName, () => {
-          const prettierConfig = preciseFormatterPrettier.resolveConfig(
-            `./test/fixtures/${fixtureName}/initial${fileExtension}`,
-          );
-          expect(prettierConfig).toMatchSnapshot();
-        });
-      },
-    );
+    fixtures.forEach(({ fixtureName, fileExtension }) => {
+      it(fixtureName, () => {
+        const prettierConfig = preciseFormatterPrettier.resolveConfig(
+          `./test/fixtures/${fixtureName}/initial${fileExtension}`,
+        );
+        expect(prettierConfig).toMatchSnapshot();
+      });
+    });
   });
 
   describe('formatRanges()', () => {

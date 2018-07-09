@@ -1,18 +1,30 @@
+sudo: required
+
+services:
+  - docker
+
 language: node_js
+
 cache:
   yarn: true
   directories:
     - node_modules
+
 notifications:
   email: false
+
 node_js:
   - '9'
   - '8'
+
 script:
   - yarn test
+  - yarn integration-tests
   - yarn build
+
 after_success:
   - npm run travis-deploy-once "npm run semantic-release"
+
 branches:
   except:
     - /^v\d+\.\d+\.\d+$/
