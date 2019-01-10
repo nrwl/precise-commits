@@ -20,7 +20,7 @@
 | Tool                | Staged files | Existing commits | PR Build | Arbitrary commands | Precision                       |
 | ------------------- | ------------ | ---------------- | -------- | ------------------ | ------------------------------- |
 | **precise-commits** | ✅           | ✅               | ✅       | ❌                 | **Individual character ranges** |
-| lint-staged         | ✅           | ❌               | ❌       | ✅                 | Entire File                     |
+| lint-staged         | ✅           | ❌               | ❌       | ✅                 | Staged Changes                  |
 | pretty-quick        | ✅           | ❌               | ❌       | ❌                 | Entire File                     |
 
 <br>
