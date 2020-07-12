@@ -80,7 +80,7 @@ export class TestBed {
   private createUniqueDirectoryForTestBed(): void {
     const dir = this.generateUniqueDirectoryName();
     this.TEST_BED_DIRECTORY_PATH = join(TestBed.TMP_DIRECTORY_PATH, dir);
-    mkdirp.sync(dir);
+    mkdirp.sync(this.TEST_BED_DIRECTORY_PATH);
   }
 
   private generateUniqueDirectoryName(): string {
