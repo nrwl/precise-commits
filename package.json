@@ -17,7 +17,7 @@
     "semantic-release": "semantic-release",
     "precommit": "npm test && npm run precise-commits",
     "cz": "git-cz",
-    "precise-commits": "bin/index.js",
+    "precise-commits": "node bin/index.js",
     "travis-deploy-once": "travis-deploy-once"
   },
   "devDependencies": {
